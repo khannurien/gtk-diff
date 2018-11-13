@@ -66,7 +66,7 @@ s_node * list_append(s_node * head, void * data) {
 	newNode->next = NULL;
 
 	// parcours jusqu'au dernier noeud
-	// la liste est-elle vide ? si oui, on renvoie le nouveau noeud
+	// la liste est-elle vide ? si oui, on retourne le nouveau noeud
 	if (head == NULL) {
 		return newNode;
 	} else {
@@ -85,14 +85,17 @@ s_node * list_append(s_node * head, void * data) {
 // application d'une fonction sur les données enregistrées dans la liste
 // last est le dernier noeud traité.
 int list_process(s_node * head, int (* fct)(s_node * node, void * param), void * param, s_node ** last) {
-	// liste vide : on retourne NULL
+	// liste vide : on retourne 1
 	if (head == NULL) return 1;
 
-	// parcours de la liste jusqu'au dernier noeud "traitable"
+	// si la fonction est appliquée avec succès sur les données, on enregistre un pointeur
+	// sur le dernier noeud traité dans *last
+	// sinon, on retourne 1.
 	s_node * curseur = head;
 	while (curseur != NULL) {
-		if (fct(curseur, param) == 1) {
-			* last = curseur;
+		if (fct(curseur->data, param) == 0) {
+			*last = curseur;
+		} else {
 			return 1;
 		}
 		curseur = curseur->next;
