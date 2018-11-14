@@ -5,24 +5,28 @@
 // fonction de test
 // affiche le contenu de la liste et sa taille
 void list_dump(s_node * head) {
-	s_node * curseur = head;
-	int * maDonnee;
-	int cpt = 0;
+	if (head == NULL) {
+		printf("Liste vide.\n");
+	} else {
+		s_node * curseur = head;
+		int * maDonnee;
+		int cpt = 0;
 
-	printf("( ");
+		printf("( ");
 
-	// parcours de la liste
-	while (curseur != NULL) {
-		maDonnee = list_get_data(curseur);
-		printf("%d ", *maDonnee);
+		// parcours de la liste
+		while (curseur != NULL) {
+			maDonnee = list_get_data(curseur);
+			printf("%d ", *maDonnee);
 
-		cpt++;
-		curseur = curseur->next;
+			cpt++;
+			curseur = curseur->next;
+		}
+
+		printf(")\n");
+
+		printf("Taille de la liste : %d\n", cpt);
 	}
-
-	printf(")\n");
-
-	printf("Taille de la liste : %d\n", cpt);
 }
 
 // création d'une nouvelle liste vide
@@ -83,17 +87,17 @@ s_node * list_append(s_node * head, void * data) {
 }
 
 // application d'une fonction sur les données enregistrées dans la liste
-// last est le dernier noeud traité.
+// last est le dernier noeud traité
 int list_process(s_node * head, int (* fct)(s_node * node, void * param), void * param, s_node ** last) {
 	// liste vide : on retourne 1
 	if (head == NULL) return 1;
 
 	// si la fonction est appliquée avec succès sur les données, on enregistre un pointeur
 	// sur le dernier noeud traité dans *last
-	// sinon, on retourne 1.
+	// sinon, on retourne 1
 	s_node * curseur = head;
 	while (curseur != NULL) {
-		if (fct(curseur->data, param) == 0) {
+		if ((fct(curseur, param)) == 0) {
 			*last = curseur;
 		} else {
 			return 1;
@@ -101,6 +105,9 @@ int list_process(s_node * head, int (* fct)(s_node * node, void * param), void *
 		curseur = curseur->next;
 	}
 
+	// la fonction a été appliquée à l'ensemble des noeuds
+	// *last contient un pointeur vers le dernier noeud traité
+	// on retourne 0
 	return 0;
 }
 
@@ -156,14 +163,9 @@ s_node * list_headRemove(s_node * head) {
 // destruction d'une liste
 // la libération des données n'est pas prise en charge
 void list_destroy(s_node * head) {
-	// parcours des éléments jusqu'à la fin de la liste
-	// destruction de la liste noeud par noeud
-	s_node * curseur = head;
-	while (head != NULL) {
-		curseur = head;
-		head = head->next;
-		free(curseur);
-	}
+	// on utilise headRemove jusqu'à épuisement de la liste
+	while (head != NULL)
+		head = list_headRemove(head);
 }
 
 // insertion d'une donnée dans une liste ordonnée

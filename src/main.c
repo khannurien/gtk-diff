@@ -2,86 +2,75 @@
 #include <stdio.h>
 #include "list.h"
 
+// fonction passée à list_process afin de la tester
+// incrémente la valeur référencée dans node->data
+int incremente(s_node * node, void * param) {
+	// typecast
+	int * data = (int *) list_get_data(node);
+	int * intParam = (int *) param;
+	// modification de la valeur
+	* data += (* intParam);
+
+	return 0;
+}
+
 int main(int argc, char * argv[], char * envp[]) {
-	int test = 50;
-	int test2 = 100;
-	int test3 = 200;
-	int test1337 = 1337;
+	// tableau de données de test
+	int tabTest[10] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+	//char tabTest[10] = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j'};
 
-	s_node * maListe;
+	// création d'une liste
+	s_node * uneListe = list_create();
+	// affichage
+	list_dump(uneListe);
+	// remplissage d'une liste
+	for (int i = 0; i < 10; i++) 
+		uneListe = list_append(uneListe, &tabTest[i]);
+	// affichage
+	printf("Liste 1 à 10 :\n");
+	list_dump(uneListe);
 
-	printf("Liste vide\n");
-	// liste vide
-	maListe = list_create();
+	// création d'une seconde liste vide
+	s_node * maListe = list_create();
+	// affichage
 	list_dump(maListe);
 	// liste vide : ajout au début
-	maListe = list_insert(maListe, &test);
+	printf("list_insert\n");
+	maListe = list_insert(maListe, &tabTest[0]);
 	list_dump(maListe);
+	printf("list_headRemove\n");
 	maListe = list_headRemove(maListe);
 	list_dump(maListe);
 	// liste vide : ajout à la fin
-	maListe = list_append(maListe, &test2);
-	maListe = list_append(maListe, &test3);
+	printf("list_append\n");
+	maListe = list_append(maListe, &tabTest[1]);
+	maListe = list_append(maListe, &tabTest[1]);
 	list_dump(maListe);
-	maListe = list_remove(maListe, &test3);
-	list_dump(maListe);
-	maListe = list_remove(maListe, &test2);
+	printf("list_remove\n");
+	maListe = list_remove(maListe, &tabTest[1]);
+	maListe = list_remove(maListe, &tabTest[1]);
 	list_dump(maListe);
 	// suppression de la liste
+	printf("Suppression de la seconde liste\n");
 	list_destroy(maListe);
 
-	printf("\nListe à 1 élément\n");
-	// liste à 1 élément
-	maListe = list_create();
-	maListe = list_insert(maListe, &test);
-	list_dump(maListe);
-	// suppression au début
-	maListe = list_headRemove(maListe);
-	list_dump(maListe);
-	// suppression d'un élément absent au début
-	maListe = list_headRemove(maListe);
-	list_dump(maListe);
-	// suppression d'un élément quelconque absent
-	maListe = list_remove(maListe, &test3);
-	list_dump(maListe);
-	// suppression de la liste
-	list_destroy(maListe);
-
-	printf("\nListe pleine\n");
-	// liste pleine
-	maListe = list_create();
-	// insertions au début
-	maListe = list_insert(maListe, &test);
-	maListe = list_insert(maListe, &test);
-	maListe = list_insert(maListe, &test);
-	list_dump(maListe);
-	// modification de la première valeur
-	list_set_data(maListe, &test1337);
-	list_dump(maListe);
-	// insertions à la fin
-	maListe = list_append(maListe, &test2);
-	maListe = list_append(maListe, &test3);
-	list_dump(maListe);
-	// suppression de la tête
-	maListe = list_headRemove(maListe);
-	list_dump(maListe);
-	// suppression de la première instance de test2
-	maListe = list_remove(maListe, &test2);
-	list_dump(maListe);
-	// une deuxième fois
-	maListe = list_remove(maListe, &test2);
-	list_dump(maListe);
-	// suppression de la liste
-	//list_destroy(maListe);
-	//list_dump(maListe);
-
-	//int incremente(s_node * node, void * param) {
-	//	node->val = node->val + param;
-	//	return 0;
-	//}
-	// param = 1;
-	// if (s_node ** last = (s_node **) malloc(sizeof(s_node*)) == NULL) return NULL;
-	// list_process(maListe, (incremente(s_node * node, void * param)), &param, last);
+	// test list_process
+	printf("Test list_process sur une nouvelle liste\n");
+	s_node * newListe = list_create();
+	newListe = list_insert(newListe, &tabTest[4]);
+	newListe = list_insert(newListe, &tabTest[5]);
+	newListe = list_insert(newListe, &tabTest[6]);
+	printf("Valeurs initiales :\n");
+	list_dump(newListe);
+	// appel list_process avec la fonction incremente
+	int param = 1;
+	s_node ** aLast;
+	if ((aLast = (s_node **) malloc(sizeof(s_node*))) == NULL) return 1;
+	int processReturn;
+	if ((processReturn = list_process(newListe, &incremente, &param, aLast)) == 1)
+		printf("Erreur list_process.\n");
+	printf("Valeurs après list_process :\n");
+	list_dump(newListe);
 
 	return EXIT_SUCCESS;
 }

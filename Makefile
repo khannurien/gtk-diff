@@ -8,4 +8,4 @@ main.o: src/main.c src/list.h
 	gcc -c src/main.c -o obj/main.o
 
 clean:
-	rm bin/* obj/*
+	rm bin/progTest* obj/*.o
