@@ -2,8 +2,8 @@
 #include <stdio.h>
 #include "list.h"
 
-// fonction de test
-// affiche le contenu de la liste et sa taille
+// fonctions de test
+// affichage du contenu d'une liste et de sa taille
 void list_dump(s_node * head) {
 	if (head == NULL) {
 		printf("Liste vide.\n");
@@ -170,3 +170,53 @@ void list_destroy(s_node * head) {
 
 // insertion d'une donnée dans une liste ordonnée
 // une fonction passée en paramètre est appelée pour comparer deux données
+s_node * orderedList_insert(s_node * head, int (*fct)(s_node * node, void * data), void * data) {
+	// liste vide
+	// on insère la donnée dans le premier noeud
+	if (head == NULL) {
+		head=list_insert(head, data);
+		return head;
+	}
+
+	// comparaison avec la fonction node_compare
+	if (fct(head, data) == 1) {
+		head = list_insert(head, data);
+		return head;
+	}
+
+	// liste à un seul élément
+	// *data n'est pas inférieur à la donnée en tête de liste
+	if (head->next == NULL) {
+		head = list_append(head, data);
+ 		return head;
+	}
+
+	// création d'un nouveau noeud avec *data
+	s_node * newNode;
+	if ((newNode = (s_node *) malloc(sizeof(s_node))) == NULL)
+		return NULL;
+
+	list_set_data(newNode, data);
+	
+	// ouverture de deux curseurs
+	s_node * nextNode = (head->next);
+	s_node * prevNode = head;
+
+	// parcours de la liste
+	while (nextNode != NULL) {
+		// on cherche le premier noeud avec *data supérieur à *intData
+		// on insère le nouveau noeud avant
+		if (fct(nextNode, data) == 1) {
+			prevNode->next = newNode;
+			newNode->next = nextNode;
+			return head;
+		}
+
+		prevNode = nextNode;
+		nextNode = nextNode->next;
+	}
+
+	// *data correspond à la plus grande donnée de la liste
+	head = list_append(head, data);
+ 	return head;
+}

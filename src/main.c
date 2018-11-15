@@ -3,7 +3,7 @@
 #include "list.h"
 
 // fonction passée à list_process afin de la tester
-// incrémente la valeur référencée dans node->data
+// incrémentation de la donnée d'un noeud
 int incremente(s_node * node, void * param) {
 	// typecast
 	int * data = (int *) list_get_data(node);
@@ -13,10 +13,18 @@ int incremente(s_node * node, void * param) {
 
 	return 0;
 }
+// fonction passée à orderedList_insert afin de comparer deux noeuds
+// retourne 1 si la donnée du noeud est strictement supérieure à la donnée passée
+// retourne 0 si la donnée du noeud est inférieure ou égale à la donnée passée
+int node_compare(s_node * node, void * data) {
+	return (*((int*) list_get_data(node)) > *((int*) data));
+}
 
+// main de tests sur les listes
 int main(int argc, char * argv[], char * envp[]) {
 	// tableau de données de test
 	int tabTest[10] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+	int tabTest2[10] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
 	//char tabTest[10] = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j'};
 
 	// création d'une liste
@@ -66,11 +74,36 @@ int main(int argc, char * argv[], char * envp[]) {
 	int param = 1;
 	s_node ** aLast;
 	if ((aLast = (s_node **) malloc(sizeof(s_node*))) == NULL) return 1;
-	int processReturn;
-	if ((processReturn = list_process(newListe, &incremente, &param, aLast)) == 1)
+	if ((list_process(newListe, &incremente, &param, aLast)) == 1)
 		printf("Erreur list_process.\n");
 	printf("Valeurs après list_process :\n");
 	list_dump(newListe);
+	// suppression de la liste
+	list_destroy(newListe);
+
+	// création d'une liste ordonnée
+	printf("Test orderedList_insert sur liste ordonnée\n");
+	s_node * orderedList = list_create();
+	for (int i = 0; i < 10; i++) 
+		orderedList = list_append(orderedList, &tabTest2[i]);
+	// affichage
+	printf("Liste 1 à 10 :\n");
+	list_dump(orderedList);
+	// suppression d'une valeur
+	printf("Suppression d'une valeur\n");
+	orderedList = list_remove(orderedList, &tabTest2[5]);
+	list_dump(orderedList);
+	// insertion d'une donnée
+	printf("Insertion d'une valeur\n");
+	orderedList = orderedList_insert(orderedList, &node_compare, &tabTest2[5]);
+	list_dump(orderedList);
+
+	// list_set_data
+	printf("Test de list_set_data\n");
+	list_set_data(orderedList, &tabTest2[9]);
+	list_dump(orderedList);
+	// suppression de la dernière liste
+	list_destroy(orderedList);
 
 	return EXIT_SUCCESS;
 }

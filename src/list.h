@@ -5,6 +5,7 @@ typedef struct _list_node {
 } s_node;
 
 // fonction de test
+// affichage du contenu d'une liste et de sa taille
 void list_dump(s_node * head);
 
 // création d'une nouvelle liste vide
@@ -40,3 +41,4 @@ void list_destroy(s_node * head);
 
 // insertion d'une donnée dans une liste ordonnée
 // une fonction passée en paramètre est appelée pour comparer deux données
+s_node * orderedList_insert(s_node * head, int (*fct)(s_node * node, void * data), void * data);
