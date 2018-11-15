@@ -92,14 +92,16 @@ int list_process(s_node * head, int (* fct)(s_node * node, void * param), void *
 	// liste vide : on retourne 1
 	if (head == NULL) return 1;
 
-	// si la fonction est appliquée avec succès sur les données, on enregistre un pointeur
+	// initialisation de *last
+	*last = NULL;
+
+	// si la fonction échoue sur le traitement des données, on enregistre un pointeur
 	// sur le dernier noeud traité dans *last
 	// sinon, on retourne 1
 	s_node * curseur = head;
 	while (curseur != NULL) {
-		if ((fct(curseur, param)) == 0) {
+		if ((fct(curseur, param)) == 1) {
 			*last = curseur;
-		} else {
 			return 1;
 		}
 		curseur = curseur->next;

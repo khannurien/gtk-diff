@@ -17,15 +17,22 @@ int incremente(s_node * node, void * param) {
 // retourne 1 si la donnée du noeud est strictement supérieure à la donnée passée
 // retourne 0 sur la donnée du noeud est égale à la donnée passée
 // retourne -1 si la donnée du noeud est strictement inférieure à la donnée passée
+// retourne -2 si les deux données n'ont pas pu être comparées
 int node_compare(s_node * node, void * data) {
-	if (*((int*) list_get_data(node)) > *((int*) data))
+	int nodeData = *((int*) list_get_data(node));
+	int testData = *((int*) data);
+
+	if (nodeData > testData)
 		return 1;
 	
-	if (*((int*) list_get_data(node)) == *((int*) data))
+	if (nodeData == testData)
 		return 0;
 
-	if (*((int*) list_get_data(node)) < *((int*) data))
+	if (nodeData < testData)
 		return -1;
+
+	// erreur de comparaison
+	return -2;
 }
 
 // main de tests sur les listes
@@ -35,6 +42,7 @@ int main(int argc, char * argv[], char * envp[]) {
 	int tabTestbis[10] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
 	int tabTest2[10] = {10, 9, 8, 7, 6, 5, 4, 3, 2, 1};
 	//char tabTest[10] = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j'};
+	int donneeInf = -1;
 	int donneeSup = 11;
 
 	// création d'une liste
@@ -46,6 +54,22 @@ int main(int argc, char * argv[], char * envp[]) {
 		list_dump(firstList);
 	} else {
 		printf("Erreur lors de la création de la liste.\n");
+	}
+
+	// headRemove sur liste vide
+	if ((firstList = list_headRemove(firstList)) == NULL) {
+		printf("headRemove sur liste vide OK. Affichage :\n");
+		list_dump(firstList);
+	} else {
+		printf("Erreur suppression de la tête de liste.\n");
+	}
+
+	// remove sur liste vide
+	if ((firstList = list_remove(firstList, &donneeSup)) == NULL) {
+		printf("remove sur liste vide OK. Affichage :\n");
+		list_dump(firstList);
+	} else {
+		printf("Erreur suppression de la tête de liste.\n");
 	}
 
 	// ajout en tête
@@ -94,6 +118,28 @@ int main(int argc, char * argv[], char * envp[]) {
 		}
 	}
 
+	// list_append sur liste vide
+	if ((firstList = list_append(firstList, &tabTest[2])) != NULL) {
+		printf("Insertion en queue OK. Affichage :\n");
+		list_dump(firstList);
+	} else {
+		printf("Erreur insertion en queue de liste.\n");
+	}
+	// list_append
+	if ((firstList = list_append(firstList, &tabTest[2])) != NULL) {
+		printf("Insertion en queue OK. Affichage :\n");
+		list_dump(firstList);
+	} else {
+		printf("Erreur insertion en queue de liste.\n");
+	}
+	// list_append
+	if ((firstList = list_append(firstList, &tabTest[2])) != NULL) {
+		printf("Insertion en queue OK. Affichage :\n");
+		list_dump(firstList);
+	} else {
+		printf("Erreur insertion en queue de liste.\n");
+	}
+
 	// suppression de la liste
 	list_destroy(firstList);
 	printf("Liste supprimée.\n\n");
@@ -127,24 +173,40 @@ int main(int argc, char * argv[], char * envp[]) {
 	printf("Liste ordonnée croissante de 1 à 10 :\n");
 	list_dump(orderedList);
 	// suppression d'une valeur
-	printf("Suppression de la dernière valeur\n");
+	printf("Suppression de la dernière valeur (10)\n");
 	orderedList = list_remove(orderedList, &tabTestbis[9]);
 	list_dump(orderedList);
 	// insertion d'une donnée
-	printf("Insertion de la dernière valeur\n");
+	printf("Insertion de la dernière valeur (10)\n");
 	nodeTest = orderedList_insert(&orderedList, &node_compare, &tabTestbis[9]);
 	list_dump(orderedList);
+	list_dump(nodeTest);
 	// suppression d'une valeur
-	printf("Suppression de la première valeur\n");
+	printf("Suppression de la première valeur (1)\n");
 	orderedList = list_remove(orderedList, &tabTestbis[0]);
 	list_dump(orderedList);
 	// insertion d'une donnée
-	printf("Insertion de la première valeur\n");
+	printf("Insertion de la première valeur (1)\n");
 	nodeTest = orderedList_insert(&orderedList, &node_compare, &tabTestbis[0]);
 	list_dump(orderedList);
+	list_dump(nodeTest);
+	// suppression d'une donnée en milieu de liste
+	printf("Suppression d'une donnée en milieu de liste (5)\n");
+	orderedList = list_remove(orderedList, &tabTestbis[4]);
+	list_dump(nodeTest);
+	// insertion d'une donnée en milieu de liste
+	printf("Insertion d'une donnée en milieu de liste (5)\n");
+	nodeTest = orderedList_insert(&orderedList, &node_compare, &tabTestbis[4]);
+	list_dump(orderedList);
+	list_dump(nodeTest);
 	// insertion d'une donnée plus grande
 	printf("Insertion d'une donnée plus grande que toutes\n");
 	nodeTest = orderedList_insert(&orderedList, &node_compare, &donneeSup);
+	list_dump(orderedList);
+	list_dump(nodeTest);
+	// insertion d'une donnée plus petite
+	printf("Insertion d'une donnée plus petite que toutes\n");
+	nodeTest = orderedList_insert(&orderedList, &node_compare, &donneeInf);
 	list_dump(orderedList);
 	list_dump(nodeTest);
 
