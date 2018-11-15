@@ -41,4 +41,5 @@ void list_destroy(s_node * head);
 
 // insertion d'une donnée dans une liste ordonnée
 // une fonction passée en paramètre est appelée pour comparer deux données
-s_node * orderedList_insert(s_node * head, int (*fct)(s_node * node, void * data), void * data);
+// retourne l'élément inséré ou l'instance existante de cet élément
+s_node * orderedList_insert(s_node ** head, int (*fct)(s_node * node, void * data), void * data);

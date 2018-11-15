@@ -170,53 +170,51 @@ void list_destroy(s_node * head) {
 
 // insertion d'une donnée dans une liste ordonnée
 // une fonction passée en paramètre est appelée pour comparer deux données
-s_node * orderedList_insert(s_node * head, int (*fct)(s_node * node, void * data), void * data) {
+s_node * orderedList_insert(s_node ** head, int (*fct)(s_node * node, void * data), void * data) {
 	// liste vide
 	// on insère la donnée dans le premier noeud
-	if (head == NULL) {
-		head=list_insert(head, data);
-		return head;
+	if ((*head) == NULL) {
+		(*head) = list_insert((*head), data);
+		return (*head);
 	}
 
-	// comparaison avec la fonction node_compare
-	if (fct(head, data) == 1) {
-		head = list_insert(head, data);
-		return head;
+	// comparaison en tête de liste avec la fonction node_compare
+	if (fct((*head), data) == 1) {
+		// la donnée est inférieure à la tête de liste
+		// on insère en tête de liste, et on renvoie la tête de liste
+		(*head) = list_insert((*head), data);
+		return (*head);
+		// la donnée est égale, on renvoie la tête de liste
+	} else if (fct((*head), data) == 0) {
+		return (*head);
 	}
-
-	// liste à un seul élément
-	// *data n'est pas inférieur à la donnée en tête de liste
-	if (head->next == NULL) {
-		head = list_append(head, data);
- 		return head;
-	}
-
-	// création d'un nouveau noeud avec *data
-	s_node * newNode;
-	if ((newNode = (s_node *) malloc(sizeof(s_node))) == NULL)
-		return NULL;
-
-	list_set_data(newNode, data);
-	
+		
 	// ouverture de deux curseurs
-	s_node * nextNode = (head->next);
-	s_node * prevNode = head;
+	s_node * nextNode = ((*head)->next);
+	s_node * prevNode = (*head);
+
 
 	// parcours de la liste
 	while (nextNode != NULL) {
-		// on cherche le premier noeud avec *data supérieur à *intData
-		// on insère le nouveau noeud avant
-		if (fct(nextNode, data) == 1) {
+		// on teste chaque noeud
+		if (fct(nextNode, data) == -1) {
+			// si le noeud est strictement inférieur à la donnée on poursuit le parcours
+			prevNode = nextNode;
+			nextNode = nextNode->next;
+		} else if (fct(nextNode, data) == 0) {
+			// si le noeud contient la donnée
+			return nextNode;
+		} else if (fct(nextNode, data) == 1) {
+			// si le noeud est strictement supérieur à la donnée
+			s_node * newNode = list_insert(nextNode, data);
 			prevNode->next = newNode;
-			newNode->next = nextNode;
-			return head;
+			return newNode;
 		}
-
-		prevNode = nextNode;
-		nextNode = nextNode->next;
 	}
 
-	// *data correspond à la plus grande donnée de la liste
-	head = list_append(head, data);
- 	return head;
+	// la donnée est plus grande que toutes les autres dans la liste
+	// on l'insère à la fin
+	s_node * newNode = list_insert(nextNode, data);
+	prevNode->next = newNode;
+	return newNode;
 }
