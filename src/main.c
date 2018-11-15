@@ -24,43 +24,69 @@ int node_compare(s_node * node, void * data) {
 int main(int argc, char * argv[], char * envp[]) {
 	// tableau de données de test
 	int tabTest[10] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
-	int tabTest2[10] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+	int tabTest2[10] = {10, 9, 8, 7, 6, 5, 4, 3, 2, 1};
 	//char tabTest[10] = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j'};
 
 	// création d'une liste
-	s_node * uneListe = list_create();
-	// affichage
-	list_dump(uneListe);
-	// remplissage d'une liste
-	for (int i = 0; i < 10; i++) 
-		uneListe = list_append(uneListe, &tabTest[i]);
-	// affichage
-	printf("Liste 1 à 10 :\n");
-	list_dump(uneListe);
+	s_node * firstList;
 
-	// création d'une seconde liste vide
-	s_node * maListe = list_create();
-	// affichage
-	list_dump(maListe);
-	// liste vide : ajout au début
-	printf("list_insert\n");
-	maListe = list_insert(maListe, &tabTest[0]);
-	list_dump(maListe);
-	printf("list_headRemove\n");
-	maListe = list_headRemove(maListe);
-	list_dump(maListe);
-	// liste vide : ajout à la fin
-	printf("list_append\n");
-	maListe = list_append(maListe, &tabTest[1]);
-	maListe = list_append(maListe, &tabTest[1]);
-	list_dump(maListe);
-	printf("list_remove\n");
-	maListe = list_remove(maListe, &tabTest[1]);
-	maListe = list_remove(maListe, &tabTest[1]);
-	list_dump(maListe);
+	// tests
+	if ((firstList = list_create()) == NULL) {
+		printf("Liste vide OK. Affichage :\n");
+		list_dump(firstList);
+	} else {
+		printf("Erreur lors de la création de la liste.\n");
+	}
+
+	// ajout en tête
+	if ((firstList = list_insert(firstList, &tabTest[0])) != NULL) {
+		printf("Insertion en tête OK. Affichage :\n");
+		list_dump(firstList);
+	} else {
+		printf("Erreur insertion en tête de liste.\n");
+	}
+	// second ajout en tête
+	if ((firstList = list_insert(firstList, &tabTest[1])) != NULL) {
+		printf("Insertion en tête OK. Affichage :\n");
+		list_dump(firstList);
+	} else {
+		printf("Erreur insertion en tête de liste.\n");
+	}
+
+	// ajout en queue de liste
+	if ((firstList = list_append(firstList, &tabTest[2])) != NULL) {
+		printf("Insertion en queue OK. Affichage :\n");
+		list_dump(firstList);
+	} else {
+		printf("Erreur insertion en queue de liste.\n");
+	}
+	// second ajout en queue de liste
+	if ((firstList = list_append(firstList, &tabTest[3])) != NULL) {
+		printf("Insertion en queue OK. Affichage :\n");
+		list_dump(firstList);
+	} else {
+		printf("Erreur insertion en queue de liste.\n");
+	}
+
+	// suppression d'une valeur connue dans la liste
+	if ((firstList = list_remove(firstList, &tabTest[1])) != NULL) {
+		printf("Suppression de '2' OK. Affichage :\n");
+		list_dump(firstList);
+	}
+
+	// suppression des noeuds un à un
+	while (firstList != NULL) {
+		if ((firstList = list_headRemove(firstList)) != NULL) {
+			printf("Noeud supprimé.\n");
+		} else {
+			printf("Dernier noeud supprimé. Affichage :\n");
+			list_dump(firstList);
+		}
+	}
+
 	// suppression de la liste
-	printf("Suppression de la seconde liste\n");
-	list_destroy(maListe);
+	list_destroy(firstList);
+	printf("Liste supprimée.\n\n");
 
 	// test list_process
 	printf("Test list_process sur une nouvelle liste\n");

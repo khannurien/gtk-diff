@@ -117,10 +117,9 @@ s_node * list_remove(s_node * head, void * data) {
 	// liste vide : on retourne NULL
 	if (head == NULL) return NULL;
 
-	// liste à un élément : on retourne la liste vide
-	if (head->next == NULL) {
-		free(head);
-		return NULL;
+	// si c'est le premier élément : on retourne la liste vide
+	if (list_get_data(head) == data) {
+		return list_headRemove(head);
 	}
 
 	// parcours de la liste jusqu'à la donnée
@@ -130,11 +129,12 @@ s_node * list_remove(s_node * head, void * data) {
 		if (list_get_data(curseur) == data) {
 			// décalage du noeud vers le suivant
 			precedent->next = curseur->next;
+			free(curseur);
 			return head;
-		} else {
-			precedent = curseur;
-			curseur = curseur->next;
-		}
+		} 
+		
+		precedent = curseur;
+		curseur = curseur->next;
 	}
 
 	return head;
