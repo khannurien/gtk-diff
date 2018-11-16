@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include "strhash.h"
 #include "list.h"
 
 // fonction passée à list_process afin de la tester
@@ -35,8 +36,8 @@ int node_compare(s_node * node, void * data) {
 	return -2;
 }
 
-// main de tests sur les listes
-int main(int argc, char * argv[], char * envp[]) {
+// fonction de test sur les listes
+int list_test(void) {
 	// tableau de données de test
 	int tabTest[10] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
 	int tabTestbis[10] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
@@ -216,6 +217,15 @@ int main(int argc, char * argv[], char * envp[]) {
 	list_dump(orderedList);
 	// suppression de la dernière liste
 	list_destroy(orderedList);
+
+	// tests unitaires OK :-)
+	return 1;
+}
+
+// main de tests sur les listes
+int main(int argc, char * argv[], char * envp[]) {
+	if ((list_test()) == 1)
+		printf("Tests unitaires sur les listes : OK.\n");
 
 	return EXIT_SUCCESS;
 }

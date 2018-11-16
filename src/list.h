@@ -1,3 +1,6 @@
+#ifndef _LIST_
+#define _LIST_
+
 // noeud
 typedef struct _list_node {
 	void * data;
@@ -43,3 +46,5 @@ void list_destroy(s_node * head);
 // une fonction passée en paramètre est appelée pour comparer deux données
 // retourne l'élément inséré ou l'instance existante de cet élément
 s_node * orderedList_insert(s_node ** head, int (*fct)(s_node * node, void * data), void * data);
+
+#endif
