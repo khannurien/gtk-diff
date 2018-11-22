@@ -20,8 +20,8 @@ int incremente(s_node * node, void * param) {
 // retourne -1 si la donnée du noeud est strictement inférieure à la donnée passée
 // retourne -2 si les deux données n'ont pas pu être comparées
 int node_compare(s_node * node, void * data) {
-	int nodeData = *((int*) list_get_data(node));
-	int testData = *((int*) data);
+	int nodeData = *((int *) list_get_data(node));
+	int testData = *((int *) data);
 
 	if (nodeData > testData)
 		return 1;
@@ -222,10 +222,95 @@ int list_test(void) {
 	return 1;
 }
 
+int hash_test(void) {
+	// données de test
+	char * tabTest[] = {"héhé", "blablablablablabla", "coucoucoucou", "", "72438202355"};
+	char * tabTest2[] = {"okokok", "ubo", "Aurevoir"};
+	char * testChar = "testChar";
+
+	// création d'une hashmap
+	hashmap * newMap;
+
+	// hashmap vide
+	printf("Création et affichage d'une hashmap vide :\n");
+	if ((newMap = hashmap_create(HASHMAP_INIT_SIZE)) == NULL)
+		printf("Erreur à l'allocation de la hashmap.\n");
+	hash_dump(newMap);
+
+	// analyse des codes retour
+	int result;
+
+	// insertions
+	printf("Insertion d'un élément (\"blablablablablabla\") dans une hashmap vide :\n");
+	hashmap_insert(newMap, tabTest[1]);
+	hash_dump(newMap);
+
+	printf("Insertion du même élément (\"blablablablablabla\") une seconde fois :\n");
+	hashmap_insert(newMap, tabTest[1]);
+	hash_dump(newMap);
+
+	printf("Insertion d'un autre élément (\"coucoucoucou\") :\n");
+	hashmap_insert(newMap, tabTest[2]);
+	hash_dump(newMap);
+
+	printf("Insertion d'un autre élément (\"héhé\") :\n");
+	hashmap_insert(newMap, tabTest[0]);
+	hash_dump(newMap);
+
+	printf("Insertion d'un autre élément (\"72438202355\"):\n");
+	hashmap_insert(newMap, tabTest[4]);
+	hash_dump(newMap);
+
+	// données statistiques
+	printf("Affichage de données statistiques :\n");
+	hashmap_stats(newMap);
+
+	// insertion des éléments du second tableau
+	hashmap_insert(newMap, tabTest2[0]);
+	hashmap_insert(newMap, tabTest2[1]);
+	hashmap_insert(newMap, tabTest2[2]);
+	hash_dump(newMap);
+
+	// remise à zéro
+	printf("Remise à zéro de la hashmap.\n");
+	hashmap_free(newMap);
+	hash_dump(newMap);
+
+	// suppression d'un élément dans la hashmap vide
+	printf("Suppression d'un élément absent dans la hashmap vide (\"coucoucoucou\") :\n");
+	hashmap_remove(newMap, tabTest[2]);
+	hash_dump(newMap);
+
+	// ré-insertion du même élément
+	printf("Insertion d'un autre élément (chaîne vide) :\n");
+	hashmap_insert(newMap, tabTest[3]);
+	hash_dump(newMap);
+	printf("Insertion du même élément (chaîne vide), à nouveau :\n");
+	hashmap_insert(newMap, tabTest[3]);
+	hash_dump(newMap);
+
+	// suppression d'un élément absent
+	printf("Suppression d'un élément absent de la hashmap (\"coucoucoucou\") :\n");
+	hashmap_remove(newMap, tabTest[2]);
+	hash_dump(newMap);
+
+	// destruction de la hashmap
+	printf("Destruction de la hashmap.\n");
+	hashmap_destroy(newMap);
+
+	// tests unitaires OK :-)
+	return 1;
+}
+
 // main de tests sur les listes
 int main(int argc, char * argv[], char * envp[]) {
 	if ((list_test()) == 1)
-		printf("Tests unitaires sur les listes : OK.\n");
+		printf("Tests unitaires sur les listes : OK.\n\n");
+
+	printf("\n==============================\n\n");
+
+	if ((hash_test()) == 1)
+		printf("Tests unitaires sur les hashmaps : OK.\n\n");
 
 	return EXIT_SUCCESS;
 }

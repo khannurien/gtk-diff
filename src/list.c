@@ -3,7 +3,7 @@
 #include "list.h"
 
 // fonctions de test
-// affichage du contenu d'une liste et de sa taille
+// affichage du contenu d'une liste d'entiers et de sa taille
 void list_dump(s_node * head) {
 	if (head == NULL) {
 		printf("Liste vide.\n");
@@ -26,6 +26,28 @@ void list_dump(s_node * head) {
 		printf(")\n");
 
 		printf("Taille de la liste : %d\n", cpt);
+	}
+}
+
+// affichage du contenu d'une liste de chaînes de caractères et de sa taille
+void strlist_dump(s_node * head) {
+	if (head == NULL) {
+		printf("( Liste vide. )\n");
+	} else {
+		s_node * curseur = head;
+		char * maDonnee;
+
+		printf("( ");
+
+		// parcours de la liste
+		while (curseur != NULL) {
+			maDonnee = list_get_data(curseur);
+			printf("\"%s\" ", maDonnee);
+
+			curseur = curseur->next;
+		}
+
+		printf(")\n");
 	}
 }
 
@@ -93,22 +115,20 @@ int list_process(s_node * head, int (* fct)(s_node * node, void * param), void *
 	if (head == NULL) return 1;
 
 	// initialisation de *last
-	*last = NULL;
+	* last = NULL;
 
-	// si la fonction échoue sur le traitement des données, on enregistre un pointeur
-	// sur le dernier noeud traité dans *last
-	// sinon, on retourne 1
+	// si la fonction appelée retourne 1, on enregistre un pointeur sur le dernier noeud traité dans *last
+	// on retourne 1
 	s_node * curseur = head;
 	while (curseur != NULL) {
 		if ((fct(curseur, param)) == 1) {
-			*last = curseur;
+			* last = curseur;
 			return 1;
 		}
 		curseur = curseur->next;
 	}
 
 	// la fonction a été appliquée à l'ensemble des noeuds
-	// *last contient un pointeur vers le dernier noeud traité
 	// on retourne 0
 	return 0;
 }
@@ -175,16 +195,16 @@ void list_destroy(s_node * head) {
 s_node * orderedList_insert(s_node ** head, int (*fct)(s_node * node, void * data), void * data) {
 	// liste vide
 	// on insère la donnée dans le premier noeud
-	if ((*head) == NULL) {
-		(*head) = list_insert((*head), data);
-		return (*head);
+	if ((* head) == NULL) {
+		(* head) = list_insert((* head), data);
+		return (* head);
 	}
 
 	// comparaison en tête de liste avec la fonction node_compare
-	if (fct((*head), data) == 1) {
+	if (fct((* head), data) > 0) {
 		// la donnée est inférieure à la tête de liste
-		// on insère en tête de liste, et on renvoie la tête de liste
-		(*head) = list_insert((*head), data);
+		// on insère la donnée en tête de liste, et on renvoie la tête de liste
+		(* head) = list_insert((*head), data);
 		return (*head);
 		// la donnée est égale, on renvoie la tête de liste
 	} else if (fct((*head), data) == 0) {
@@ -195,19 +215,18 @@ s_node * orderedList_insert(s_node ** head, int (*fct)(s_node * node, void * dat
 	s_node * nextNode = ((*head)->next);
 	s_node * prevNode = (*head);
 
-
 	// parcours de la liste
 	while (nextNode != NULL) {
 		// on teste chaque noeud
-		if (fct(nextNode, data) == -1) {
+		if (fct(nextNode, data) < 0) {
 			// si le noeud est strictement inférieur à la donnée on poursuit le parcours
 			prevNode = nextNode;
 			nextNode = nextNode->next;
 		} else if (fct(nextNode, data) == 0) {
-			// si le noeud contient la donnée
+			// si le noeud contient la donnée on retourne le noeud
 			return nextNode;
-		} else if (fct(nextNode, data) == 1) {
-			// si le noeud est strictement supérieur à la donnée
+		} else if (fct(nextNode, data) > 0) {
+			// si le noeud est strictement supérieur à la donnée on insère la donnée avant
 			s_node * newNode = list_insert(nextNode, data);
 			prevNode->next = newNode;
 			return newNode;

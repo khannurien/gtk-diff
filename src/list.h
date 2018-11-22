@@ -8,8 +8,10 @@ typedef struct _list_node {
 } s_node;
 
 // fonction de test
-// affichage du contenu d'une liste et de sa taille
+// affichage du contenu d'une liste d'entiers et de sa taille
 void list_dump(s_node * head);
+// affichage du contenu d'une liste de chaînes de caractères et de sa taille
+void strlist_dump(s_node * head);
 
 // création d'une nouvelle liste vide
 s_node * list_create(void);
@@ -28,7 +30,7 @@ s_node * list_append(s_node * head, void * data);
 
 // application d'une fonction sur les données enregistrées dans la liste
 // last est le dernier noeud traité.
-int list_process(s_node * head, int (*fct)(s_node * node, void * param), void * param, s_node ** last);
+int list_process(s_node * head, int (* fct)(s_node * node, void * param), void * param, s_node ** last);
 
 // suppression de la première instance d'une donnée dans la liste
 // retourne la tête de liste
@@ -45,6 +47,6 @@ void list_destroy(s_node * head);
 // insertion d'une donnée dans une liste ordonnée
 // une fonction passée en paramètre est appelée pour comparer deux données
 // retourne l'élément inséré ou l'instance existante de cet élément
-s_node * orderedList_insert(s_node ** head, int (*fct)(s_node * node, void * data), void * data);
+s_node * orderedList_insert(s_node ** head, int (* fct)(s_node * node, void * data), void * data);
 
 #endif
