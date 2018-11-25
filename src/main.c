@@ -156,13 +156,15 @@ int list_test(void) {
 	// appel list_process avec la fonction incremente
 	int param = 1;
 	s_node ** aLast;
-	if ((aLast = (s_node **) malloc(sizeof(s_node*))) == NULL) return 1;
+	if ((aLast = (s_node **) malloc(sizeof(s_node *))) == NULL) return 1;
 	if ((list_process(newListe, &incremente, &param, aLast)) == 1)
 		printf("Erreur list_process.\n");
 	printf("Valeurs après list_process :\n");
 	list_dump(newListe);
 	// suppression de la liste
 	list_destroy(newListe);
+	// libération de ** aLast
+	free(aLast);
 
 	// création d'une liste ordonnée
 	s_node * nodeTest;
@@ -219,7 +221,7 @@ int list_test(void) {
 	list_destroy(orderedList);
 
 	// tests unitaires OK :-)
-	return 1;
+	return 0;
 }
 
 int hash_test(void) {
@@ -266,15 +268,25 @@ int hash_test(void) {
 	hashmap_stats(newMap);
 
 	// insertion des éléments du second tableau
+	printf("Ajout de trois nouveaux éléments :\n");
 	hashmap_insert(newMap, tabTest2[0]);
 	hashmap_insert(newMap, tabTest2[1]);
 	hashmap_insert(newMap, tabTest2[2]);
+	hash_dump(newMap);
+
+	// suppression des éléments du premier tableau
+	printf("Suppression des anciens éléments :\n");
+	hashmap_remove(newMap, tabTest[0]);
+	hashmap_remove(newMap, tabTest[1]);
+	hashmap_remove(newMap, tabTest[2]);
+	hashmap_remove(newMap, tabTest[4]);
 	hash_dump(newMap);
 
 	// remise à zéro
 	printf("Remise à zéro de la hashmap.\n");
 	hashmap_free(newMap);
 	hash_dump(newMap);
+	printf("pouet\n");
 
 	// suppression d'un élément dans la hashmap vide
 	printf("Suppression d'un élément absent dans la hashmap vide (\"coucoucoucou\") :\n");
@@ -296,21 +308,23 @@ int hash_test(void) {
 
 	// destruction de la hashmap
 	printf("Destruction de la hashmap.\n");
-	hashmap_destroy(newMap);
+	if (hashmap_destroy(newMap) == 1)
+		printf("Erreur lors de la libération des listes chaînées.\n");
+		return 1;
 
 	// tests unitaires OK :-)
-	return 1;
+	return 0;
 }
 
 // main de tests sur les listes
 int main(int argc, char * argv[], char * envp[]) {
-	if ((list_test()) == 1)
+	if ((list_test()) == 0)
 		printf("Tests unitaires sur les listes : OK.\n\n");
 
 	printf("\n==============================\n\n");
 
-	if ((hash_test()) == 1)
+	if ((hash_test()) == 0)
 		printf("Tests unitaires sur les hashmaps : OK.\n\n");
 
-	return EXIT_SUCCESS;
+	return 0;
 }

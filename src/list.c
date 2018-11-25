@@ -114,10 +114,10 @@ int list_process(s_node * head, int (* fct)(s_node * node, void * param), void *
 	// liste vide : on retourne 1
 	if (head == NULL) return 1;
 
-	// initialisation de *last
+	// initialisation de * last
 	* last = NULL;
 
-	// si la fonction appelée retourne 1, on enregistre un pointeur sur le dernier noeud traité dans *last
+	// si la fonction appelée retourne 1, on enregistre un pointeur sur le dernier noeud traité dans * last
 	// on retourne 1
 	s_node * curseur = head;
 	while (curseur != NULL) {
@@ -212,8 +212,8 @@ s_node * orderedList_insert(s_node ** head, int (*fct)(s_node * node, void * dat
 	}
 		
 	// ouverture de deux curseurs
-	s_node * nextNode = ((*head)->next);
-	s_node * prevNode = (*head);
+	s_node * nextNode = ((* head)->next);
+	s_node * prevNode = (* head);
 
 	// parcours de la liste
 	while (nextNode != NULL) {

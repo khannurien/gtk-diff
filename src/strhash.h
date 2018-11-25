@@ -27,10 +27,10 @@ static unsigned int hash_calc(char * str, int mapSize);
 hashmap * hashmap_create();
 
 // destruction d'une table de hashage
-void hashmap_destroy(hashmap * map); 
+int hashmap_destroy(hashmap * map); 
 
 // libération des données enregistrées dans une table de hashage
-void hashmap_free(hashmap * map);
+int hashmap_free(hashmap * map);
 
 // ajout d'un mot dans la table si le mot concerné ne s'y trouve pas déjà
 char * hashmap_insert(hashmap * map, char * str);
