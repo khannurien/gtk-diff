@@ -73,24 +73,25 @@ static unsigned int hash_calc(char * str, int mapSize) {
 }
 
 // création d'une table de hashage
-hashmap * hashmap_create() {
+// TODO: passer la taille en paramètre
+hashmap * hashmap_create(int mapSize) {
 	// allocation de la hashmap
 	hashmap * map;
 	if ((map = (hashmap *) malloc(sizeof(hashmap))) == NULL)
 		return NULL;
 
 	// initialisation d'une hashmap vide
-	map->size = HASHMAP_INIT_SIZE;
+	map->size = mapSize;
 
 	// allocation des listes chaînées
-	if ((map->tab = (superlist *) malloc(HASHMAP_INIT_SIZE * sizeof(superlist))) == NULL) {
+	if ((map->tab = (superlist *) malloc(mapSize * sizeof(superlist))) == NULL) {
 		free(map);
 		return NULL;
 	}
 
 	// création des listes chaînées
 	int i;
-	for (i = 0; i < HASHMAP_INIT_SIZE; i++) {
+	for (i = 0; i < map->size; i++) {
 		map->tab[i].head = list_create();
 		map->tab[i].size = 0;
 	}
@@ -130,7 +131,7 @@ int hashmap_empty(hashmap * map) {
 
 		// libération de la liste chaînée
 		list_destroy(chain[i].head);
-		chain[i].head = NULL;
+		chain[i].head = list_create();
 	}
 
 	return 0;
@@ -166,7 +167,7 @@ int hashmap_remove(hashmap * map, char * str) {
 	// calcul de la clef pour le mot
 	unsigned int strHash = hash_calc(str, (map->size));
 
-	// pointeur vers la liste première superliste
+	// pointeur vers la superliste
 	superlist * chain = map->tab;
 
 	// list_process retrouve le noeud à supprimer et le stocke dans * nodeRemove

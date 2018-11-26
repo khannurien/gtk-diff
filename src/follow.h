@@ -22,27 +22,28 @@ typedef struct text {
 } text;
 
 typedef struct follow {
-	// table de hachage (une seule)
 	hashmap * map;
 	text * pTextRef; // doc référence
 	text * pNewText; // doc représentant le nouveau texte
 	text * diffText; // doc représentant la différence entre les deux
 } follow;
 
-// token_dump
+// création de la structure follow et sa hashmap
+// le reste des champs est à NULL
+follow * follow_init();
 
 // allocation et chargement du texte
-// prend le chemin d'accès et renvoie le char * text
-// text * text_load(const char * filename);
+// retourne la structure text * pour un texte à partir de son chemin d'accès
+text * text_load(const char * filename);
 
-// get_next_token(...)
-
-// fonction de découpage
-// while next_token je prends le token et je l'envoie dans tokenizedText
+// fonctions de découpage
+token * get_next_token(char * text, hashmap * map, int * offset);
+void text_tokenize(hashmap * map, text * textStruct);
 
 // algo PLSC (Plus Longue Sous-Séquence Commune)
 // les éléments communs doivent être dans le même ordre, mais pas nécessairement consécutifs
 // fonction 1 : retourne la matrice PLSC int ** et prend les 2 struct text (ancien et nouveau)
 // fonction 2 : on prend la matrice en [n][m] (max ligne/colonne)
+int ** plsc(text * refText, text * newText);
 
 #endif

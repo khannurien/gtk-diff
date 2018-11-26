@@ -2,9 +2,6 @@
 #define _STRHASH_
 #include "list.h"
 
-// taille des hashmaps
-#define HASHMAP_INIT_SIZE 10
-
 // superliste
 typedef struct superlist {
 	int size;
@@ -24,7 +21,7 @@ void hash_dump(hashmap * map);
 static unsigned int hash_calc(char * str, int mapSize);
 
 // création d'une table de hashage
-hashmap * hashmap_create();
+hashmap * hashmap_create(int mapSize);
 
 // destruction d'une table de hashage
 int hashmap_destroy(hashmap * map); 

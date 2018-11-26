@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include "follow.h"
 #include "strhash.h"
 #include "list.h"
 
@@ -235,7 +236,7 @@ int hash_test(void) {
 
 	// hashmap vide
 	printf("Création et affichage d'une hashmap vide :\n");
-	if ((newMap = hashmap_create()) == NULL) {
+	if ((newMap = hashmap_create(10)) == NULL) {
 		printf("Erreur à l'allocation de la hashmap.\n");
 		return 1;
 	}
@@ -245,7 +246,9 @@ int hash_test(void) {
 
 	// insertions
 	printf("Insertion d'un élément (\"blablablablablabla\") dans une hashmap vide :\n");
-	hashmap_insert(newMap, tabTest[1]);
+	char * wordCheck;
+	wordCheck = hashmap_insert(newMap, tabTest[1]);
+	printf("Retour de hashmap_insert : %s\n", wordCheck);
 	hash_dump(newMap);
 
 	printf("Insertion du même élément (\"blablablablablabla\") une seconde fois :\n");
@@ -253,7 +256,9 @@ int hash_test(void) {
 	hash_dump(newMap);
 
 	printf("Suppression d'un élément (\"blablablablablabla\") sans pointeur :\n");
-	hashmap_remove(newMap, "blablablablablabla");
+	int removeCheck;
+	removeCheck = hashmap_remove(newMap, "blablablablablabla");
+	printf("Retour de hashmap_remove : %d\n", removeCheck);
 	hash_dump(newMap);
 
 	printf("Insertion d'un autre élément (\"coucoucoucou\") :\n");
@@ -295,7 +300,7 @@ int hash_test(void) {
 	// seconde hashmap
 	printf("Création d'une seconde hashmap :\n");
 	hashmap * secondMap;
-	if ((secondMap = hashmap_create()) == NULL) {
+	if ((secondMap = hashmap_create(10)) == NULL) {
 		printf("Erreur à l'allocation de la hashmap.\n");
 		return 1;
 	}
@@ -330,6 +335,19 @@ int hash_test(void) {
 	return 0;
 }
 
+int follow_test(void) {
+	// chargement d'un premier texte
+	text * newText;
+	if ((newText = text_load("/Users/vincent/test.txt")) == NULL)
+		return 1;
+
+	printf("%s\n", newText->text);
+	printf("%d\n", newText->textSize);
+
+	// tests unitaires OK :-)
+	return 0;
+}
+
 // main de tests sur les listes
 int main(int argc, char * argv[], char * envp[]) {
 	if ((list_test()) == 0)
@@ -339,6 +357,11 @@ int main(int argc, char * argv[], char * envp[]) {
 
 	if ((hash_test()) == 0)
 		printf("Tests unitaires sur les hashmaps : OK.\n\n");
+
+	printf("\n==============================\n\n");
+
+	if ((follow_test()) == 0)
+		printf("Tests unitaires sur follow : OK.\n\n");
 
 	return 0;
 }
