@@ -111,11 +111,11 @@ s_node * list_append(s_node * head, void * data) {
 // application d'une fonction sur les données enregistrées dans la liste
 // last est le dernier noeud traité
 int list_process(s_node * head, int (* fct)(s_node * node, void * param), void * param, s_node ** last) {
-	// liste vide : on retourne 1
-	if (head == NULL) return 1;
-
 	// initialisation de * last
 	* last = NULL;
+
+	// liste vide : on retourne 0
+	if (head == NULL) return 0;
 
 	// si la fonction appelée retourne 1, on enregistre un pointeur sur le dernier noeud traité dans * last
 	// on retourne 1
@@ -204,11 +204,11 @@ s_node * orderedList_insert(s_node ** head, int (*fct)(s_node * node, void * dat
 	if (fct((* head), data) > 0) {
 		// la donnée est inférieure à la tête de liste
 		// on insère la donnée en tête de liste, et on renvoie la tête de liste
-		(* head) = list_insert((*head), data);
-		return (*head);
+		(* head) = list_insert((* head), data);
+		return (* head);
 		// la donnée est égale, on renvoie la tête de liste
-	} else if (fct((*head), data) == 0) {
-		return (*head);
+	} else if (fct((* head), data) == 0) {
+		return (* head);
 	}
 		
 	// ouverture de deux curseurs

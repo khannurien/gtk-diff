@@ -235,12 +235,11 @@ int hash_test(void) {
 
 	// hashmap vide
 	printf("Création et affichage d'une hashmap vide :\n");
-	if ((newMap = hashmap_create(HASHMAP_INIT_SIZE)) == NULL)
+	if ((newMap = hashmap_create()) == NULL)
 		printf("Erreur à l'allocation de la hashmap.\n");
 	hash_dump(newMap);
 
-	// analyse des codes retour
-	int result;
+	hashmap_remove(newMap, tabTest[1]);
 
 	// insertions
 	printf("Insertion d'un élément (\"blablablablablabla\") dans une hashmap vide :\n");
@@ -249,6 +248,10 @@ int hash_test(void) {
 
 	printf("Insertion du même élément (\"blablablablablabla\") une seconde fois :\n");
 	hashmap_insert(newMap, tabTest[1]);
+	hash_dump(newMap);
+
+	printf("Suppression d'un élément (\"blablablablablabla\") sans pointeur :\n");
+	hashmap_remove(newMap, "blablablablablabla");
 	hash_dump(newMap);
 
 	printf("Insertion d'un autre élément (\"coucoucoucou\") :\n");
@@ -286,25 +289,31 @@ int hash_test(void) {
 	printf("Remise à zéro de la hashmap.\n");
 	hashmap_free(newMap);
 	hash_dump(newMap);
-	printf("pouet\n");
+
+	// seconde hashmap
+	printf("Création d'une seconde hashmap :\n");
+	hashmap * secondMap;
+	if ((secondMap = hashmap_create()) == NULL)
+		printf("Erreur à l'allocation de la hashmap.\n");
+	hash_dump(secondMap);
 
 	// suppression d'un élément dans la hashmap vide
 	printf("Suppression d'un élément absent dans la hashmap vide (\"coucoucoucou\") :\n");
-	hashmap_remove(newMap, tabTest[2]);
-	hash_dump(newMap);
+	hashmap_remove(secondMap, tabTest[2]);
+	hash_dump(secondMap);
 
 	// ré-insertion du même élément
 	printf("Insertion d'un autre élément (chaîne vide) :\n");
-	hashmap_insert(newMap, tabTest[3]);
-	hash_dump(newMap);
+	hashmap_insert(secondMap, tabTest[3]);
+	hash_dump(secondMap);
 	printf("Insertion du même élément (chaîne vide), à nouveau :\n");
-	hashmap_insert(newMap, tabTest[3]);
-	hash_dump(newMap);
+	hashmap_insert(secondMap, tabTest[3]);
+	hash_dump(secondMap);
 
 	// suppression d'un élément absent
 	printf("Suppression d'un élément absent de la hashmap (\"coucoucoucou\") :\n");
-	hashmap_remove(newMap, tabTest[2]);
-	hash_dump(newMap);
+	hashmap_remove(secondMap, tabTest[2]);
+	hash_dump(secondMap);
 
 	// destruction de la hashmap
 	printf("Destruction de la hashmap.\n");

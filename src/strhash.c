@@ -17,7 +17,9 @@ int string_compare(s_node * node, void * data) {
 
 // fonction de libération des données des listes passée à list_process
 int list_free(s_node * node, void * data) {
-	free(node);
+	free(node->data);
+	//node->data = NULL;
+	//free(node);
 	return 0;
 }
 
@@ -110,25 +112,27 @@ int hashmap_destroy(hashmap * map) {
 	free(map->tab);
 	// libération de la hashmap
 	free(map);
+
+	return 0;
 }
 
 // libération des données enregistrées dans une table de hashage
 int hashmap_free(hashmap * map) {
 	// pointeur vers la première superliste
 	superlist * chain = map->tab;
-	// création d'un pointeur ** last pour stocker le dernier noeud traité
+	// création d'un pointeur * last pour stocker le dernier noeud traité
 	s_node * last;
 
 	// parcours des listes chaînées
 	int i;
 	for (i = 0; i < map->size; i++) {
-		// libération des données des listes chaînées
-		if ((list_process(chain[i].head, &list_free, NULL, &last)) == 1) {
-			// on a supprimé un noeud
-			printf("ok ok\n");
-		} else {
-			printf("bla\n");
-		}
+		// libération des données de la liste chaînée
+		list_process(chain[i].head, &list_free, NULL, &last);
+		chain[i].size = 0;
+
+		// libération de la liste chaînée
+		list_destroy(chain[i].head);
+		chain[i].head = NULL;
 	}
 
 	return 0;
@@ -170,7 +174,6 @@ int hashmap_remove(hashmap * map, char * str) {
 	// list_process retrouve le noeud à supprimer et le stocke dans * nodeRemove
 	s_node * nodeRemove;
 	if (list_process(chain[strHash].head, &string_remove, str, &nodeRemove) == 0) {
-		// on n'a pas trouvé l'élément à supprimer
 		// on retourne 1
 		return 1;
 	}
