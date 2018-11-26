@@ -18,8 +18,6 @@ int string_compare(s_node * node, void * data) {
 // fonction de libération des données des listes passée à list_process
 int list_free(s_node * node, void * data) {
 	free(node->data);
-	//node->data = NULL;
-	//free(node);
 	return 0;
 }
 
@@ -105,7 +103,7 @@ hashmap * hashmap_create() {
 int hashmap_destroy(hashmap * map) {
 	// libération des listes chaînées de la hashmap
 	// en cas d'erreur, on retourne 1
-	if (hashmap_free(map) == 1)
+	if (hashmap_empty(map) == 1)
 		return 1;
 	
 	// libération de la superliste
@@ -117,7 +115,7 @@ int hashmap_destroy(hashmap * map) {
 }
 
 // libération des données enregistrées dans une table de hashage
-int hashmap_free(hashmap * map) {
+int hashmap_empty(hashmap * map) {
 	// pointeur vers la première superliste
 	superlist * chain = map->tab;
 	// création d'un pointeur * last pour stocker le dernier noeud traité
@@ -177,6 +175,8 @@ int hashmap_remove(hashmap * map, char * str) {
 		// on retourne 1
 		return 1;
 	}
+	// on libère les données du noeud à supprimer
+	free(nodeRemove->data);
 	// list_remove récupère le noeud à supprimer
 	chain[strHash].head = list_remove(chain[strHash].head, nodeRemove->data);
 	// on décrémente la taille de la liste chaînée

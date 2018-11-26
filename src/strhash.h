@@ -30,7 +30,7 @@ hashmap * hashmap_create();
 int hashmap_destroy(hashmap * map); 
 
 // libération des données enregistrées dans une table de hashage
-int hashmap_free(hashmap * map);
+int hashmap_empty(hashmap * map);
 
 // ajout d'un mot dans la table si le mot concerné ne s'y trouve pas déjà
 char * hashmap_insert(hashmap * map, char * str);

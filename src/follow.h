@@ -14,21 +14,19 @@ typedef struct token {
 } token;
 
 typedef struct text {
-	char * text; // texture brut (longueur divisée par i.e. 5)
-	int textSize;
+	char * text; // texte brut (longueur divisée par i.e. 5)
+	int textSize; // longueur texte brut
 	struct token ** tokenizedText; // texte découpé, alloué dynamiquement, à realloc de 20% quand on a trop de mots
-	int nbTokens;
-	int nbWordTokens;
-	// TODO: longueur du texte brut, nb jetons total, nb jetons WORD...
+	int nbTokens; // nb total jetons
+	int nbWordTokens; // nb jetons WORD
 } text;
 
 typedef struct follow {
 	// table de hachage (une seule)
 	hashmap * map;
 	text * pTextRef; // doc référence
-	text * pNewText;
-	// doc représentant le nouveau texte
-	// doc représentant la différence entre les deux
+	text * pNewText; // doc représentant le nouveau texte
+	text * diffText; // doc représentant la différence entre les deux
 } follow;
 
 // token_dump

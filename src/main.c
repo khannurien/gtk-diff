@@ -235,8 +235,10 @@ int hash_test(void) {
 
 	// hashmap vide
 	printf("Création et affichage d'une hashmap vide :\n");
-	if ((newMap = hashmap_create()) == NULL)
+	if ((newMap = hashmap_create()) == NULL) {
 		printf("Erreur à l'allocation de la hashmap.\n");
+		return 1;
+	}
 	hash_dump(newMap);
 
 	hashmap_remove(newMap, tabTest[1]);
@@ -287,14 +289,16 @@ int hash_test(void) {
 
 	// remise à zéro
 	printf("Remise à zéro de la hashmap.\n");
-	hashmap_free(newMap);
+	hashmap_empty(newMap);
 	hash_dump(newMap);
 
 	// seconde hashmap
 	printf("Création d'une seconde hashmap :\n");
 	hashmap * secondMap;
-	if ((secondMap = hashmap_create()) == NULL)
+	if ((secondMap = hashmap_create()) == NULL) {
 		printf("Erreur à l'allocation de la hashmap.\n");
+		return 1;
+	}
 	hash_dump(secondMap);
 
 	// suppression d'un élément dans la hashmap vide
@@ -317,9 +321,10 @@ int hash_test(void) {
 
 	// destruction de la hashmap
 	printf("Destruction de la hashmap.\n");
-	if (hashmap_destroy(newMap) == 1)
+	if (hashmap_destroy(newMap) == 1) {
 		printf("Erreur lors de la libération des listes chaînées.\n");
 		return 1;
+	}
 
 	// tests unitaires OK :-)
 	return 0;
