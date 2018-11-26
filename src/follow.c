@@ -2,6 +2,8 @@
 #include <stdio.h>
 #include "follow.h"
 
+// allocation et chargement du texte
+// retourne la structure text * pour un texte à partir de son chemin d'accès
 text * text_load(const char * filename) {
 	// ouverture du fichier
 	FILE * fp;
@@ -46,6 +48,25 @@ text * text_load(const char * filename) {
 	return fileText;
 }
 
+// création de la structure follow et sa hashmap
+// le reste des champs est à NULL
+follow * follow_init(void) {
+	// allocation de la nouvelle instance de follow
+	follow * newFollow;
+	if ((newFollow = (follow *) malloc(sizeof(follow))) == NULL)
+		return NULL;
+
+	// création de la hashmap
+	if ((newFollow->map = hashmap_create(10)) == NULL) {
+		free(newFollow);
+		return NULL;
+	}
+
+	// on retourne la nouvelle instance
+	return newFollow;
+}
+
+// fonctions de découpage
 void text_tokenize(hashmap * map, text * textStruct) {
 	// while next_token je prends le token et je l'envoie dans tokenizedText
 }

@@ -30,7 +30,7 @@ typedef struct follow {
 
 // création de la structure follow et sa hashmap
 // le reste des champs est à NULL
-follow * follow_init();
+follow * follow_init(void);
 
 // allocation et chargement du texte
 // retourne la structure text * pour un texte à partir de son chemin d'accès

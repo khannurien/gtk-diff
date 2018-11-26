@@ -344,11 +344,15 @@ int follow_test(void) {
 	printf("%s\n", newText->text);
 	printf("%d\n", newText->textSize);
 
+	// création d'un nouveau follow
+	follow * newFollow;
+	newFollow = follow_init();
+
 	// tests unitaires OK :-)
 	return 0;
 }
 
-// main de tests sur les listes
+// ensemble des tests
 int main(int argc, char * argv[], char * envp[]) {
 	if ((list_test()) == 0)
 		printf("Tests unitaires sur les listes : OK.\n\n");
