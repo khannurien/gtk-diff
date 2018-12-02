@@ -15,7 +15,7 @@ text * text_load(const char * filename) {
 	if ((fileText = (text *) malloc(sizeof(text))) == NULL)
 		return NULL;
 
-	// taille du texte initial
+	// taille du texte initial, en caractères
 	fseek(fp, 0, SEEK_END);
 	fileText->textSize = ftell(fp);
 	fseek(fp, 0, SEEK_SET);
@@ -66,7 +66,48 @@ follow * follow_init(void) {
 	return newFollow;
 }
 
-// fonctions de découpage
+// fonction de tokenisation d'un mot
+token * get_next_token(char * text, hashmap * map, int * offset) {
+	// on alloue et on initialise un nouveau token
+	token * newToken;
+	// malloc... union dans un struct ?
+	newToken->textOffset = (* offset);
+
+	// on se déplace sur le mot à lire
+	char * word = (text += (* offset));
+
+	// analyse du mot
+	char aChar;
+	//	while (aChar != 'de quoi ?') {
+		// on définit token->type
+		//	if (aChar == '...') {
+		//		token.type = ...
+		//	}
+		// on met à jour la donnée du token
+		//	if ((token.type == WORD) || (...)) {
+		//		token->data = ...
+		//	}
+	//	}
+
+	// on incrémente l'offset
+	(* offset)++;
+
+	// on retourne le token
+	return newToken;
+}
+
+// fonction de découpage d'un texte en tokens stockés dans une hashmap
+// lecture séquentielle du texte pour appeler get_next_token
 void text_tokenize(hashmap * map, text * textStruct) {
-	// while next_token je prends le token et je l'envoie dans tokenizedText
+	// offset pour la lecture du mot suivant
+	int i = 0;
+	int * pOffset = &i;
+
+	// lecture séquentielle
+	token * aToken;
+	// tant que le texte n'est pas terminé, on le découpe en tokens
+	while ((* pOffset) < textStruct->textSize) {
+		if ((aToken = get_next_token(textStruct->text, map, pOffset)) != NULL)
+			textStruct->tokenizedText[(* pOffset)] = aToken;
+	}
 }

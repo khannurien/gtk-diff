@@ -336,17 +336,34 @@ int hash_test(void) {
 }
 
 int follow_test(void) {
+	// chemin des fichiers
+	char * refFile = "/testRef.txt";
+	char * newFile = "/testNew.txt";
 	// chargement d'un premier texte
+	text * refText;
+	if ((refText = text_load(refFile)) == NULL)
+		return 1;
+	// et de sa version modifiée
 	text * newText;
-	if ((newText = text_load("/Users/vincent/test.txt")) == NULL)
+	if ((newText = text_load(newFile)) == NULL)
 		return 1;
 
-	printf("%s\n", newText->text);
-	printf("%d\n", newText->textSize);
+	// affichage du texte d'origine
+	printf("%s\n", refText->text);
+	printf("%d\n", refText->textSize);
 
 	// création d'un nouveau follow
 	follow * newFollow;
 	newFollow = follow_init();
+	// association au texte d'origine et à sa version modifiée
+	newFollow->pRefText = refText;
+	newFollow->pNewText = newText;
+
+	// tokenisation du texte
+	printf("Tokenisation...\n");
+	// quelle hashmap ?
+	text_tokenize(newFollow->map, refText);
+	text_tokenize(newFollow->map, newText);
 
 	// tests unitaires OK :-)
 	return 0;
@@ -366,6 +383,8 @@ int main(int argc, char * argv[], char * envp[]) {
 
 	if ((follow_test()) == 0)
 		printf("Tests unitaires sur follow : OK.\n\n");
+	else if ((follow_test()) == 1)
+		printf("[follow] Erreur de lecture des fichiers.\n\n");
 
 	return 0;
 }

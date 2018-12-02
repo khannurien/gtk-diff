@@ -23,7 +23,7 @@ typedef struct text {
 
 typedef struct follow {
 	hashmap * map;
-	text * pTextRef; // doc référence
+	text * pRefText; // doc référence
 	text * pNewText; // doc représentant le nouveau texte
 	text * diffText; // doc représentant la différence entre les deux
 } follow;
@@ -36,8 +36,11 @@ follow * follow_init(void);
 // retourne la structure text * pour un texte à partir de son chemin d'accès
 text * text_load(const char * filename);
 
-// fonctions de découpage
+// fonction de tokenisation d'un mot
 token * get_next_token(char * text, hashmap * map, int * offset);
+
+// fonction de découpage d'un texte en tokens stockés dans une hashmap
+// lecture séquentielle du texte pour appeler get_next_token
 void text_tokenize(hashmap * map, text * textStruct);
 
 // algo PLSC (Plus Longue Sous-Séquence Commune)
