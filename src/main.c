@@ -337,8 +337,8 @@ int hash_test(void) {
 
 int follow_test(void) {
 	// chemin des fichiers
-	char * refFile = "/testRef.txt";
-	char * newFile = "/testNew.txt";
+	char * refFile = "data/testRef.txt";
+	char * newFile = "data/testNew.txt";
 	// chargement d'un premier texte
 	text * refText;
 	if ((refText = text_load(refFile)) == NULL)
@@ -360,10 +360,14 @@ int follow_test(void) {
 	newFollow->pNewText = newText;
 
 	// tokenisation du texte
-	printf("Tokenisation...\n");
-	// quelle hashmap ?
+	printf("Tokenisation du texte d'origine...\n");
 	text_tokenize(newFollow->map, refText);
+	printf("Tokenisation du texte modifié...\n");
 	text_tokenize(newFollow->map, newText);
+
+	// affichage de la hashmap
+	printf("Affichage de la hashmap après tokenisation :\n");
+	hash_dump(newFollow->map);
 
 	// tests unitaires OK :-)
 	return 0;

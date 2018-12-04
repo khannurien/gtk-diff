@@ -14,8 +14,8 @@ typedef struct token {
 } token;
 
 typedef struct text {
-	char * text; // texte brut (longueur divisée par i.e. 5)
-	int textSize; // longueur texte brut
+	char * text; // texte brut
+	int textSize; // longueur grossière (i.e. 1/5 * nb caractères), en mots, du texte brut
 	struct token ** tokenizedText; // texte découpé, alloué dynamiquement, à realloc de 20% quand on a trop de mots
 	int nbTokens; // nb total jetons
 	int nbWordTokens; // nb jetons WORD
