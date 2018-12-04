@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 #include "follow.h"
 #include "strhash.h"
 
@@ -97,7 +98,7 @@ token * get_next_token(char * text, hashmap * map, int * offset, int * words) {
 			newToken->type = SHORT_SPACE;
 			int j;
 			for (j = 0; j < i; j++)
-				newToken->data.space[i] = word[i];
+				newToken->data.space[j] = aChar[j];
 		} else if (i > 4) {
 			// espace long : on change le type du token
 			newToken->type = SPACE;
@@ -122,7 +123,7 @@ token * get_next_token(char * text, hashmap * map, int * offset, int * words) {
 		// sinon, c'est un mot
 		newToken->type = WORD;
 
-		// on alloue l'espace nécessaire à un buffer
+		// on alloue l'espace nécessaire à un buffer de vingt caractères
 		char * buffer;
 		if ((buffer = (char *) malloc(20 * sizeof(char))) == NULL) {
 			free(newToken);
@@ -131,11 +132,11 @@ token * get_next_token(char * text, hashmap * map, int * offset, int * words) {
 
 		// on lit le mot jusqu'à un délimiteur ou un signe de ponctuation
 		int i = 0;
-		while ((aChar[i] != ' ') || (aChar[i] != '\t') || (aChar[i] != '\n') || (aChar[i] != '\r') ||
-			(aChar[i] != ',') || (aChar[i] != ';') || (aChar[i] != ':') || (aChar[i] != '?') || (aChar[i] != '!') || (aChar[i] != '.')) {
+		while ((aChar[i] != ' ') && (aChar[i] != '\t') && (aChar[i] != '\n') && (aChar[i] != '\r') &&
+			(aChar[i] != ',') && (aChar[i] != ';') && (aChar[i] != ':') && (aChar[i] != '?') && (aChar[i] != '!') && (aChar[i] != '.')) {
 			// on augmente la taille du buffer si nécessaire
 			if (i > 20)
-				buffer = realloc(buffer, (i+20)*sizeof(char));
+				buffer = realloc(buffer, (i + 20) * sizeof(char));
 			
 			// on stocke chaque caractère dans le buffer
 			buffer[i] = aChar[i];
@@ -174,20 +175,16 @@ void text_tokenize(hashmap * map, text * textStruct) {
 	// lecture séquentielle
 	token * aToken;
 	// tant que le texte n'est pas terminé, on le découpe en tokens
-	while ((* pOffset) <= textStruct->textSize) {
+	while (textStruct->text[(* pOffset)] != '\0') {
 		// la taille effective du texte atteint sa taille estimée
 		if ((* pOffset) == textStruct->textSize) {
 			// on réalloue de 20% supplémentaires la taille de tokenizedText
 			textStruct->tokenizedText = realloc(textStruct->tokenizedText, ((1.2 * (textStruct->textSize)) * sizeof(token *)));
 		}
 
-		// on lit séquentiellement le texte et on stocke les tokens résultants
-		while (textStruct->text[(* pOffset)] != '\0') {
-			printf("%d\n", i); // debug
-			if ((aToken = get_next_token(textStruct->text, map, pOffset, pWords)) != NULL)
-				textStruct->tokenizedText[(* pOffset)] = aToken;
-			// else free(...);
-		}
+		// on demande le token suivant
+		if ((aToken = get_next_token(textStruct->text, map, pOffset, pWords)) != NULL)
+			textStruct->tokenizedText[(* pOffset)] = aToken;
 	}
 
 	// mise à jour de textStruct après tokenisation
