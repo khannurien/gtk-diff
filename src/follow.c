@@ -26,7 +26,7 @@ text * text_load(const char * filename) {
 	fileText->textSize = (nbChar / 5);
 
 	// allocation de l'espace requis pour le texte et le caractère sentinelle
-	if ((fileText->text = (char *) malloc((nbChar + 1) * sizeof(char))) == NULL) {
+	if ((fileText->text = (char *) malloc((nbChar) * sizeof(char))) == NULL) {
 		fclose(fp);
 		free(fileText);
 		return NULL;
@@ -78,7 +78,7 @@ follow * follow_init(void) {
 }
 
 // fonction de tokenisation d'un mot
-token * get_next_token(char * text, hashmap * map, int * offset, int * words) {
+token * get_next_token(char * text, hashmap * map, int * offset, int * tokens, int * words) {
 	// on alloue et on initialise un nouveau token
 	token * newToken;
 	if ((newToken = (token *) malloc(sizeof(token))) == NULL)
@@ -87,14 +87,12 @@ token * get_next_token(char * text, hashmap * map, int * offset, int * words) {
 	newToken->textOffset = (* offset);
 
 	// on se déplace sur le mot à lire
-	char * word = text + (* offset);
-
+	char * aChar = text + (* offset);
 	// analyse du mot
-	char * aChar = word;
 	if ((aChar[0] == ' ') || (aChar[0] == '\t') || (aChar[0] == '\n') || (aChar[0] == '\r')) {
 		// c'est au moins un délimiteur : on compte combien il y en a derrière
 		int i = 1;
-		while ((aChar[i] == ' ') || (aChar[i] == '\t') || (aChar[i] == '\n') || (aChar[i] == '\r'))
+		while (((aChar[i] == ' ') || (aChar[i] == '\t') || (aChar[i] == '\n') || (aChar[i] == '\r')) && (aChar[i] != '\0'))
 			i++;
 	
 		if (i <= 4) {	
@@ -110,20 +108,23 @@ token * get_next_token(char * text, hashmap * map, int * offset, int * words) {
 
 		// décalage de l'offset
 		(* offset) += i;
+		// incrémentation du compteur de tokens
+		(* tokens)++;
 	} else if ((aChar[0] == ',') || (aChar[0] == ';') || (aChar[0] == ':') || (aChar[0] == '?') || (aChar[0] == '!') || (aChar[0] == '.')) {
 		// le mot est un signe de ponctuation
-		// on l'enregistre avec son caractère sentinelle dans la hashmap
-		char buffer[] = {aChar[0], '\0'};
-		char * aWord = hashmap_insert(map, buffer);
-
 		// on met à jour le token
 		newToken->type = WORD;
-		newToken->data.word = aWord;
+
+		// on l'enregistre avec son caractère sentinelle dans la hashmap
+		char buffer[] = {aChar[0], '\0'};
+		newToken->data.word = hashmap_insert(map, buffer);
 
 		// décalage de l'offset
 		(* offset)++;
 		// incrémentation du compteur de WORD
 		(* words)++;
+		// incrémentation du compteur de tokens
+		(* tokens)++;
 	} else {
 		// sinon, c'est un mot
 		newToken->type = WORD;
@@ -135,9 +136,9 @@ token * get_next_token(char * text, hashmap * map, int * offset, int * words) {
 			return NULL;
 		}
 
-		// on lit le mot jusqu'à un délimiteur ou un signe de ponctuation
+		// on lit le mot jusqu'à l'EOF (cas du texte à un seul mot), un délimiteur ou un signe de ponctuation
 		int i = 0;
-		while ((aChar[i] != ' ') && (aChar[i] != '\t') && (aChar[i] != '\n') && (aChar[i] != '\r') &&
+		while ((aChar[i] != '\0') && (aChar[i] != ' ') && (aChar[i] != '\t') && (aChar[i] != '\n') && (aChar[i] != '\r') &&
 			(aChar[i] != ',') && (aChar[i] != ';') && (aChar[i] != ':') && (aChar[i] != '?') && (aChar[i] != '!') && (aChar[i] != '.')) {
 			// on augmente la taille du buffer si nécessaire
 			if (i > 20)
@@ -153,17 +154,17 @@ token * get_next_token(char * text, hashmap * map, int * offset, int * words) {
 		// on insère le caractère sentinelle
 		buffer[i] = '\0';
 
-		// on enregistre le mot dans la hashmap
-		char * aWord = hashmap_insert(map, buffer);
+		// on enregistre le mot dans la hashmap et on met à jour le pointeur data.word du token
+		newToken->data.word = hashmap_insert(map, buffer);
 		// on libère le buffer
 		free(buffer);
-		// on met à jour le pointeur data.word du token
-		newToken->data.word = aWord;
 
 		// décalage de l'offset
 		(* offset) += i;
 		// incrémentation du compteur de WORD
 		(* words)++;
+		// incrémentation du compteur de tokens
+		(* tokens)++;
 	}
 
 	// on retourne le token
@@ -179,24 +180,27 @@ void text_tokenize(hashmap * map, text * textStruct) {
 	// compteur de WORD
 	int words = 0;
 	int * pWords = &words;
+	// compteur de tokens
+	int tokens = 0;
+	int * pTokens = &tokens;
 
 	// lecture séquentielle
 	token * aToken;
 	// tant que le texte n'est pas terminé, on le découpe en tokens
 	while (textStruct->text[(* pOffset)] != '\0') {
 		// la taille effective du texte atteint sa taille estimée (nbChar / 5)
-		if ((* pOffset) == (textStruct->textSize) * 5) {
+		if ((* pOffset) >= ((textStruct->textSize) * 5)) {
 			// on réalloue de 20% supplémentaires la taille de tokenizedText
 			textStruct->tokenizedText = realloc(textStruct->tokenizedText, ((1.2 * (textStruct->textSize)) * sizeof(token *)));
 			textStruct->textSize *= 1.2;
 		}
 
 		// on demande le token suivant
-		if ((aToken = get_next_token(textStruct->text, map, pOffset, pWords)) != NULL)
-			textStruct->tokenizedText[(* pOffset)] = aToken;
+		if ((aToken = get_next_token(textStruct->text, map, pOffset, pWords, pTokens)) != NULL)
+			textStruct->tokenizedText[(* pTokens) - 1] = aToken;
 	}
 
 	// mise à jour de textStruct après tokenisation
-	textStruct->nbTokens = i; // à corriger ?
-	textStruct->nbWordTokens = words;
+	textStruct->nbTokens = (* pTokens);
+	textStruct->nbWordTokens = (* pWords);
 }
