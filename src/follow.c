@@ -96,9 +96,10 @@ token * get_next_token(char * text, hashmap * map, int * offset, int * words) {
 			// espace court : on stocke les délimiteurs dans la donnée du token	
 			newToken->type = SHORT_SPACE;
 			int j;
-			for (j = 0; j <= i; j++)
+			for (j = 0; j < i; j++)
 				newToken->data.space[i] = word[i];
 		} else if (i > 4) {
+			// espace long : on change le type du token
 			newToken->type = SPACE;
 		}
 
@@ -123,7 +124,7 @@ token * get_next_token(char * text, hashmap * map, int * offset, int * words) {
 
 		// on alloue l'espace nécessaire à un buffer
 		char * buffer;
-		if ((buffer = (char *) malloc(20*sizeof(char))) == NULL) {
+		if ((buffer = (char *) malloc(20 * sizeof(char))) == NULL) {
 			free(newToken);
 			return NULL;
 		}
@@ -173,17 +174,20 @@ void text_tokenize(hashmap * map, text * textStruct) {
 	// lecture séquentielle
 	token * aToken;
 	// tant que le texte n'est pas terminé, on le découpe en tokens
-	while ((* pOffset) < textStruct->textSize) {
-		// la taille effective du texte dépasse sa taille estimée
-		if ((* pOffset) >= textStruct->textSize) {
+	while ((* pOffset) <= textStruct->textSize) {
+		// la taille effective du texte atteint sa taille estimée
+		if ((* pOffset) == textStruct->textSize) {
 			// on réalloue de 20% supplémentaires la taille de tokenizedText
 			textStruct->tokenizedText = realloc(textStruct->tokenizedText, ((1.2 * (textStruct->textSize)) * sizeof(token *)));
 		}
 
 		// on lit séquentiellement le texte et on stocke les tokens résultants
-		if ((aToken = get_next_token(textStruct->text, map, pOffset, pWords)) != NULL)
-			textStruct->tokenizedText[(* pOffset)] = aToken;
-		// else free(...);
+		while (textStruct->text[(* pOffset)] != '\0') {
+			printf("%d\n", i); // debug
+			if ((aToken = get_next_token(textStruct->text, map, pOffset, pWords)) != NULL)
+				textStruct->tokenizedText[(* pOffset)] = aToken;
+			// else free(...);
+		}
 	}
 
 	// mise à jour de textStruct après tokenisation
