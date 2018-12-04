@@ -33,13 +33,13 @@ text * text_load(const char * filename) {
 	}
 
 	// copie du texte
-	fread(fileText->text, sizeof(char), fileText->textSize, fp);
+	fread(fileText->text, sizeof(char), nbChar, fp);
 
 	// fermeture du fichier
 	fclose(fp);
 
 	// ajout du caractère sentinelle
-	fileText->text[fileText->textSize] = '\0';
+	fileText->text[nbChar] = '\0';
 
 	// allocation de tokenizedText
 	fileText->nbTokens = 0;
@@ -73,7 +73,7 @@ follow * follow_init(void) {
 }
 
 // fonction de tokenisation d'un mot
-token * get_next_token(char * text, hashmap * map, int * offset) {
+token * get_next_token(char * text, hashmap * map, int * offset, int * words) {
 	// on alloue et on initialise un nouveau token
 	token * newToken;
 	if ((newToken = (token *) malloc(sizeof(token))) == NULL)
@@ -115,6 +115,8 @@ token * get_next_token(char * text, hashmap * map, int * offset) {
 
 		// décalage de l'offset
 		(* offset)++;
+		// incrémentation du compteur de WORD
+		(* words)++;
 	} else {
 		// sinon, c'est un mot
 		newToken->type = WORD;
@@ -150,6 +152,8 @@ token * get_next_token(char * text, hashmap * map, int * offset) {
 
 		// décalage de l'offset
 		(* offset) += i;
+		// incrémentation du compteur de WORD
+		(* words)++;
 	}
 
 	// on retourne le token
@@ -162,6 +166,9 @@ void text_tokenize(hashmap * map, text * textStruct) {
 	// offset pour la lecture du mot suivant
 	int i = 0;
 	int * pOffset = &i;
+	// compteur de WORD
+	int words = 0;
+	int * pWords = &words;
 
 	// lecture séquentielle
 	token * aToken;
@@ -174,8 +181,13 @@ void text_tokenize(hashmap * map, text * textStruct) {
 		}
 
 		// on lit séquentiellement le texte et on stocke les tokens résultants
-		if ((aToken = get_next_token(textStruct->text, map, pOffset)) != NULL)
+		if ((aToken = get_next_token(textStruct->text, map, pOffset, pWords)) != NULL)
 			textStruct->tokenizedText[(* pOffset)] = aToken;
 		// else free(...);
 	}
+
+	// mise à jour de textStruct après tokenisation
+	textStruct->nbTokens = i; // à corriger ?
+	textStruct->nbWordTokens = words;
+	// quid de la màj de textSize avec la valeur précise ?
 }

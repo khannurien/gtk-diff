@@ -349,8 +349,14 @@ int follow_test(void) {
 		return 1;
 
 	// affichage du texte d'origine
+	printf("Affichage du texte d'origine :\n");
 	printf("%s\n", refText->text);
 	printf("%d\n", refText->textSize);
+
+	// affichage du texte modifié
+	printf("Affichage du texte modifié :\n");
+	printf("%s\n", newText->text);
+	printf("%d\n", newText->textSize);
 
 	// création d'un nouveau follow
 	follow * newFollow;
@@ -361,9 +367,9 @@ int follow_test(void) {
 
 	// tokenisation du texte
 	printf("Tokenisation du texte d'origine...\n");
-	text_tokenize(newFollow->map, refText);
+	text_tokenize(newFollow->map, newFollow->pRefText);
 	printf("Tokenisation du texte modifié...\n");
-	text_tokenize(newFollow->map, newText);
+	text_tokenize(newFollow->map, newFollow->pNewText);
 
 	// affichage de la hashmap
 	printf("Affichage de la hashmap après tokenisation :\n");

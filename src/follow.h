@@ -37,7 +37,7 @@ follow * follow_init(void);
 text * text_load(const char * filename);
 
 // fonction de tokenisation d'un mot
-token * get_next_token(char * text, hashmap * map, int * offset);
+token * get_next_token(char * text, hashmap * map, int * offset, int * words);
 
 // fonction de découpage d'un texte en tokens stockés dans une hashmap
 // lecture séquentielle du texte pour appeler get_next_token
