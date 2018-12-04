@@ -351,14 +351,14 @@ int follow_test(void) {
 		return 1;
 
 	// affichage du texte d'origine
-	printf("Affichage du texte d'origine :\n");
+	printf("Affichage du texte d'origine (taille estimée à %d mot%s) :\n",
+		refText->textSize, (refText->textSize == 1 ? "" : "s"));
 	printf("%s\n", refText->text);
-	printf("%d\n", refText->textSize);
 
 	// affichage du texte modifié
-	printf("Affichage du texte modifié :\n");
+	printf("Affichage du texte modifié (taille estimée à %d mot%s) :\n",
+		newText->textSize, (newText->textSize == 1 ? "" : "s"));
 	printf("%s\n", newText->text);
-	printf("%d\n", newText->textSize);
 
 	// création d'un nouveau follow
 	follow * newFollow;

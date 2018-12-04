@@ -87,7 +87,7 @@ token * get_next_token(char * text, hashmap * map, int * offset, int * words) {
 	newToken->textOffset = (* offset);
 
 	// on se déplace sur le mot à lire
-	char * word = (text += (* offset));
+	char * word = text + (* offset);
 
 	// analyse du mot
 	char * aChar = word;
@@ -112,8 +112,9 @@ token * get_next_token(char * text, hashmap * map, int * offset, int * words) {
 		(* offset) += i;
 	} else if ((aChar[0] == ',') || (aChar[0] == ';') || (aChar[0] == ':') || (aChar[0] == '?') || (aChar[0] == '!') || (aChar[0] == '.')) {
 		// le mot est un signe de ponctuation
-		// on l'enregistre dans la hashmap
-		char * aWord = hashmap_insert(map, &aChar[0]);
+		// on l'enregistre avec son caractère sentinelle dans la hashmap
+		char buffer[] = {aChar[0], '\0'};
+		char * aWord = hashmap_insert(map, buffer);
 
 		// on met à jour le token
 		newToken->type = WORD;
@@ -127,9 +128,9 @@ token * get_next_token(char * text, hashmap * map, int * offset, int * words) {
 		// sinon, c'est un mot
 		newToken->type = WORD;
 
-		// on alloue l'espace nécessaire à un buffer de vingt caractères
+		// on alloue l'espace nécessaire à un buffer pour vingt caractères
 		char * buffer;
-		if ((buffer = (char *) malloc(20 * sizeof(char))) == NULL) {
+		if ((buffer = (char *) malloc(21 * sizeof(char))) == NULL) {
 			free(newToken);
 			return NULL;
 		}
@@ -140,7 +141,7 @@ token * get_next_token(char * text, hashmap * map, int * offset, int * words) {
 			(aChar[i] != ',') && (aChar[i] != ';') && (aChar[i] != ':') && (aChar[i] != '?') && (aChar[i] != '!') && (aChar[i] != '.')) {
 			// on augmente la taille du buffer si nécessaire
 			if (i > 20)
-				buffer = realloc(buffer, (i + 20) * sizeof(char));
+				buffer = realloc(buffer, (i + 21) * sizeof(char));
 			
 			// on stocke chaque caractère dans le buffer
 			buffer[i] = aChar[i];
@@ -148,6 +149,9 @@ token * get_next_token(char * text, hashmap * map, int * offset, int * words) {
 			// compteur de caractères
 			i++;
 		}
+
+		// on insère le caractère sentinelle
+		buffer[i] = '\0';
 
 		// on enregistre le mot dans la hashmap
 		char * aWord = hashmap_insert(map, buffer);
