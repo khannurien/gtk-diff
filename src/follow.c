@@ -1,6 +1,5 @@
 #include <stdlib.h>
 #include <stdio.h>
-#include <string.h>
 #include "follow.h"
 #include "strhash.h"
 
@@ -12,7 +11,7 @@ text * text_load(const char * filename) {
 	if ((fp = fopen(filename, "r")) == NULL)
 		return NULL;
 
-	// allocation du texte
+	// allocation de la structure text *
 	text * fileText;
 	if ((fileText = (text *) malloc(sizeof(text))) == NULL) {
 		fclose(fp);
@@ -22,18 +21,18 @@ text * text_load(const char * filename) {
 	// taille du texte initial, en caractères
 	fseek(fp, 0, SEEK_END);
 	int nbChar = ftell(fp);
+	fseek(fp, 0, SEEK_SET);
 	// on estime grossièrement le nombre de mots au cinquième du nombre de caractères
 	fileText->textSize = (nbChar / 5);
-	fseek(fp, 0, SEEK_SET);
 
 	// allocation de l'espace requis pour le texte et le caractère sentinelle
-	if ((fileText->text = (char *) malloc((fileText->textSize + 1) * sizeof(char))) == NULL) {
+	if ((fileText->text = (char *) malloc((nbChar + 1) * sizeof(char))) == NULL) {
 		fclose(fp);
 		free(fileText);
 		return NULL;
 	}
 
-	// copie du texte
+	// copie du texte dans la structure
 	fread(fileText->text, sizeof(char), nbChar, fp);
 
 	// fermeture du fichier
@@ -68,6 +67,11 @@ follow * follow_init(void) {
 		free(newFollow);
 		return NULL;
 	}
+
+	// initialisation des pointeurs de text *
+	newFollow->pRefText = NULL;
+	newFollow->pNewText = NULL;
+	newFollow->diffText = NULL;
 
 	// on retourne la nouvelle instance
 	return newFollow;
@@ -176,10 +180,11 @@ void text_tokenize(hashmap * map, text * textStruct) {
 	token * aToken;
 	// tant que le texte n'est pas terminé, on le découpe en tokens
 	while (textStruct->text[(* pOffset)] != '\0') {
-		// la taille effective du texte atteint sa taille estimée
-		if ((* pOffset) == textStruct->textSize) {
+		// la taille effective du texte atteint sa taille estimée (nbChar / 5)
+		if ((* pOffset) == (textStruct->textSize) * 5) {
 			// on réalloue de 20% supplémentaires la taille de tokenizedText
 			textStruct->tokenizedText = realloc(textStruct->tokenizedText, ((1.2 * (textStruct->textSize)) * sizeof(token *)));
+			textStruct->textSize *= 1.2;
 		}
 
 		// on demande le token suivant
@@ -190,5 +195,4 @@ void text_tokenize(hashmap * map, text * textStruct) {
 	// mise à jour de textStruct après tokenisation
 	textStruct->nbTokens = i; // à corriger ?
 	textStruct->nbWordTokens = words;
-	// quid de la màj de textSize avec la valeur précise ?
 }

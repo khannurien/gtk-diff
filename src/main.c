@@ -337,8 +337,10 @@ int hash_test(void) {
 
 int follow_test(void) {
 	// chemin des fichiers
-	char * refFile = "data/testRef.txt";
-	char * newFile = "data/testNew.txt";
+	char * refFile = "data/short.txt";
+	char * newFile = "data/short2.txt";
+	//char * refFile = "data/testRef.txt";
+	//char * newFile = "data/testNew.txt";
 	// chargement d'un premier texte
 	text * refText;
 	if ((refText = text_load(refFile)) == NULL)
