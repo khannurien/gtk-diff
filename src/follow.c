@@ -22,8 +22,8 @@ text * text_load(const char * filename) {
 	fseek(fp, 0, SEEK_END);
 	int nbChar = ftell(fp);
 	fseek(fp, 0, SEEK_SET);
-	// on estime grossièrement le nombre de mots au cinquième du nombre de caractères
-	fileText->textSize = (nbChar / 5);
+	// on estime grossièrement le nombre de mots au tiers du nombre de caractères
+	fileText->textSize = (nbChar / 3);
 
 	// allocation de l'espace requis pour le texte et le caractère sentinelle
 	if ((fileText->text = (char *) malloc((nbChar) * sizeof(char))) == NULL) {
@@ -104,13 +104,31 @@ token * get_next_token(char * text, hashmap * map, int * offset, int * tokens, i
 		} else if (i > 4) {
 			// espace long : on change le type du token
 			newToken->type = SPACE;
+
+			// on crée un buffer pour i caractères et le caractère sentinelle
+			char buffer[i + 1];
+
+			// on stocke chaque caractère dans le buffer
+			int j;
+			for (j = 0; j < i; j++)
+				buffer[j] = aChar[j];
+
+			// on ajoute le caractère sentinelle
+			buffer[i] = '\0';
+
+			// on insère le token dans la hashmap
+			newToken->data.word = hashmap_insert(map, buffer);
+
+			// incrémentation du compteur de WORD
+			(* words)++;
 		}
 
 		// décalage de l'offset
 		(* offset) += i;
 		// incrémentation du compteur de tokens
 		(* tokens)++;
-	} else if ((aChar[0] == ',') || (aChar[0] == ';') || (aChar[0] == ':') || (aChar[0] == '?') || (aChar[0] == '!') || (aChar[0] == '.')) {
+	} else if ((aChar[0] == ',') || (aChar[0] == ';') || (aChar[0] == ':') || (aChar[0] == '?') || (aChar[0] == '!') || (aChar[0] == '.') ||
+				(aChar[0] == '(') || (aChar[0] == ')') || (aChar[0] == '[') || (aChar[0] == ']') || (aChar[0] == '{') || (aChar[0] == '}')) {
 		// le mot est un signe de ponctuation
 		// on met à jour le token
 		newToken->type = WORD;
@@ -131,7 +149,8 @@ token * get_next_token(char * text, hashmap * map, int * offset, int * tokens, i
 
 		// on alloue l'espace nécessaire à un buffer pour vingt caractères
 		char * buffer;
-		if ((buffer = (char *) malloc(21 * sizeof(char))) == NULL) {
+		int bSize = 20;
+		if ((buffer = (char *) malloc((bSize + 1) * sizeof(char))) == NULL) {
 			free(newToken);
 			return NULL;
 		}
@@ -139,10 +158,14 @@ token * get_next_token(char * text, hashmap * map, int * offset, int * tokens, i
 		// on lit le mot jusqu'à l'EOF (cas du texte à un seul mot), un délimiteur ou un signe de ponctuation
 		int i = 0;
 		while ((aChar[i] != '\0') && (aChar[i] != ' ') && (aChar[i] != '\t') && (aChar[i] != '\n') && (aChar[i] != '\r') &&
-			(aChar[i] != ',') && (aChar[i] != ';') && (aChar[i] != ':') && (aChar[i] != '?') && (aChar[i] != '!') && (aChar[i] != '.')) {
+			(aChar[i] != ',') && (aChar[i] != ';') && (aChar[i] != ':') && (aChar[i] != '?') && (aChar[i] != '!') && (aChar[i] != '.') &&
+			(aChar[i] != '(') && (aChar[i] != ')') && (aChar[i] != '[') && (aChar[i] != ']') && (aChar[i] != '{') && (aChar[i] != '}')) {
 			// on augmente la taille du buffer si nécessaire
-			if (i > 20)
-				buffer = realloc(buffer, (i + 21) * sizeof(char));
+			if (i > bSize) {
+				// le mot le plus long en français fait 26 lettres
+				bSize += 6;
+				buffer = realloc(buffer, (bSize + 1) * sizeof(char));
+			}
 			
 			// on stocke chaque caractère dans le buffer
 			buffer[i] = aChar[i];
@@ -188,11 +211,11 @@ void text_tokenize(hashmap * map, text * textStruct) {
 	token * aToken;
 	// tant que le texte n'est pas terminé, on le découpe en tokens
 	while (textStruct->text[(* pOffset)] != '\0') {
-		// la taille effective du texte atteint sa taille estimée (nbChar / 5)
-		if ((* pOffset) >= ((textStruct->textSize) * 5)) {
-			// on réalloue de 20% supplémentaires la taille de tokenizedText
-			textStruct->tokenizedText = realloc(textStruct->tokenizedText, ((1.2 * (textStruct->textSize)) * sizeof(token *)));
-			textStruct->textSize *= 1.2;
+		// la taille effective du texte atteint sa taille estimée (nbChar / 3)
+		while ((* pTokens) >= (textStruct->textSize)) {
+			// on augmente de 20% la taille de tokenizedText
+			textStruct->textSize = (textStruct->textSize) * 1.2 + 1;
+			textStruct->tokenizedText = realloc(textStruct->tokenizedText, (textStruct->textSize * sizeof(token *)));
 		}
 
 		// on demande le token suivant
@@ -203,4 +226,132 @@ void text_tokenize(hashmap * map, text * textStruct) {
 	// mise à jour de textStruct après tokenisation
 	textStruct->nbTokens = (* pTokens);
 	textStruct->nbWordTokens = (* pWords);
+}
+
+// algo PLSC (Plus Longue Sous-Séquence Commune)
+// les éléments communs doivent être dans le même ordre, mais pas nécessairement consécutifs
+int ** plsc(text * refText, text * newText) {
+	// allocation de la matrice à deux dimensions en fonction du nombre de jetons de type WORD dans chaque structure
+	int ** lg;
+	if ((lg = (int **) malloc((refText->nbWordTokens + 1) * sizeof(int *))) == NULL)
+		return NULL;
+
+	int k;
+	for (k = 0; k < (refText->nbWordTokens + 1); k++) {
+		if ((lg[k] = (int *) malloc((newText->nbWordTokens + 1) * sizeof(int *))) == NULL) {
+			free(lg);
+			return NULL;
+		}
+	}
+
+	// initialisation de la matrice ligne et colonne en 0 à 0
+	lg[0][0] = 0;
+	// ...
+
+	// pour chaque mot de l'ancien texte (on démarre l'algo en 1,1)
+	int i = 1, j = 1;
+	int yToken, xToken;
+
+	for (yToken = 0; yToken < refText->nbTokens; yToken++) {
+		// si ce n'est pas un mot, on passe au token suivant
+		if (i > refText->nbWordTokens) break;
+
+		// sinon, pour chaque mot du nouveau texte
+		for (xToken = 0; xToken < newText->nbTokens; xToken++) {
+			// si ce n'est pas un mot, on passe au token suivant
+			if (j > newText->nbWordTokens) break;
+
+			// sinon, on remplit la matrice lg selon l'algorithme du cours
+			if (refText->tokenizedText[yToken]->data.word == newText->tokenizedText[xToken]->data.word) {
+				lg[i][j] = "..."; // TODO
+			} else {
+				lg[i][j] = "..."; // TODO
+			}
+
+			j++;
+		}
+		i++;
+	}
+
+	// on retourne la matrice complétée
+	return lg;
+}
+
+// algo de chaînage arrière pour construire le tableau de tokens faisant office de résultat de comparaison
+// on se place en (n, n) correspondant aux dernières lettres de chaque chaîne
+text * diff_create(int ** lg, text * refText, text * newText) {
+	// indices dans les matrices, initialisés au max
+	int i = (sizeof(lg)) / (sizeof(lg[0]));
+	int j = (sizeof(lg[0])) / (sizeof(lg[0][0]));
+	// nombre de tokens lus dans chaque texte
+	int refTokenRd = 0;
+	int newTokenRd = 0;
+	// nombre de tokens écrits dans le tableau de résultat
+	int diffTokenWr = 0;
+	// tableau de résultat
+	token * tDiff[newText->nbTokens + refText->nbTokens];
+
+	// parcours de la matricemake
+
+	while ((i > 0) && (j > 0)) {
+		if ((newText->tokenizedText[newTokenRd]->type == SHORT_SPACE) || (newText->tokenizedText[newTokenRd]->type == SPACE)) {
+			// si le token courant dans le nouveau texte est un espace
+			// ...
+		} else if ((refText->tokenizedText[newTokenRd]->type == SHORT_SPACE) || (refText->tokenizedText[newTokenRd]->type == SPACE)) {
+			// si le token courant dans l'ancien texte est un espace
+			refTokenRd--;
+		} else if ((lg[i][j] == lg[i - 1][j - 1] + 1) && (newText->tokenizedText[newTokenRd]->data.word == refText->tokenizedText[refTokenRd]->data.word)) {
+			// mots identiques (appartenant à la PLSC)
+			// on ajoute le token identique dans le tableau de résultat de la comparaison
+			tDiff[diffTokenWr] = newText->tokenizedText[newTokenRd];
+
+			// on décrémente les indices des tableaux de tokens concernés selon les cas :
+			newTokenRd--;
+			refTokenRd--;
+
+			// on décrémente i et j
+			i--;
+			j--;
+		} else if (lg[i][j] == lg[i - 1][j - 1]) {
+			// remplacement
+			// le jeton du nouveau texte passe en REPLACE et est ajouté au résultat
+			// le jeton de l'ancien texte passe en ERASE et est ajouté au résultat
+			// on décrémente les indices dans les tableaux de tokens concernés selon les cas
+
+			// on décrémente i et j
+			i--;
+			j--;
+		} else if (lg[i][j] == lg[i][j - 1]) {
+			// insertion
+
+			// ...
+			// on décrémente j
+			j--;
+
+			// ...
+		} else {
+			// suppression
+
+			// ...
+			// on modifie le type du jeton du texte de référence en ERASE et on l'ajoute au résultat
+			// ...
+
+			// on décrémente i
+			i--;
+		}
+	}
+
+	// il reste des mots non-exploités dans le nouveau texte
+	// ils ont été ajoutés
+	while ((j > 0) && (newTokenRd >= 0)) {
+		// ...
+		j--;
+	}
+
+	// il reste des mots non-exploités dans l'ancien texte
+	// ils ont été supprimés
+	while ((i > 0) && (refTokenRd >= 0)) {
+		// ...
+		i--;
+	}
 }

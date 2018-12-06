@@ -45,8 +45,10 @@ void text_tokenize(hashmap * map, text * textStruct);
 
 // algo PLSC (Plus Longue Sous-Séquence Commune)
 // les éléments communs doivent être dans le même ordre, mais pas nécessairement consécutifs
-// fonction 1 : retourne la matrice PLSC int ** et prend les 2 struct text (ancien et nouveau)
-// fonction 2 : on prend la matrice en [n][m] (max ligne/colonne)
 int ** plsc(text * refText, text * newText);
+
+// algo de chaînage arrière pour construire le tableau de tokens faisant office de résultat de comparaison
+// on se place en (n, n) correspondant aux dernières lettres de chaque chaîne
+text * diff_create(int ** lg, text * refText, text * newText);
 
 #endif

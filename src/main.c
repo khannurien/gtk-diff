@@ -324,6 +324,10 @@ int hash_test(void) {
 	hashmap_remove(secondMap, tabTest[2]);
 	hash_dump(secondMap);
 
+	// + de 26 espaces : segfault ?! (ici 27)
+	//hashmap_insert(secondMap, "                           ");
+	//hash_dump(secondMap);
+
 	// destruction de la hashmap
 	printf("Destruction de la hashmap.\n");
 	if (hashmap_destroy(newMap) == 1) {
@@ -339,8 +343,10 @@ int follow_test(void) {
 	// chemin des fichiers
 	//char * refFile = "data/short.txt";
 	//char * newFile = "data/short2.txt";
-	char * refFile = "data/testRef.txt";
-	char * newFile = "data/testNew.txt";
+	//char * refFile = "data/testRef.txt";
+	//char * newFile = "data/testNew.txt";
+	char * refFile = "data/segfault3.txt";
+	char * newFile = "data/segfault2.txt";
 	// chargement d'un premier texte
 	text * refText;
 	if ((refText = text_load(refFile)) == NULL)
@@ -376,6 +382,7 @@ int follow_test(void) {
 	// affichage de la hashmap
 	printf("Affichage de la hashmap après tokenisation :\n");
 	hash_dump(newFollow->map);
+	hashmap_stats(newFollow->map);
 
 	// tests unitaires OK :-)
 	return 0;
