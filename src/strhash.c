@@ -54,14 +54,14 @@ void hash_dump(hashmap * map) {
 // calcul du hash pour une chaîne de caractères
 static unsigned int hash_calc(char * str, int mapSize) {
 	// initialisation de la clef
-	int key = 0;
+	unsigned int key = 0;
 
 	// à chaque caractère, on multiplie la clef par deux et on lui ajoute
 	// le code ASCII du caractère
-	while ((*str) != '\0') {
+	while ((* str) != '\0') {
 		//key *= 2; // décalage à gauche
 		key <<= 1;
-		key += (int) (*str);
+		key += (int) (* str);
 		str++;
 	}
 

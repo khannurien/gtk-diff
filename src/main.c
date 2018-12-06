@@ -242,8 +242,6 @@ int hash_test(void) {
 	}
 	hash_dump(newMap);
 
-	hashmap_remove(newMap, tabTest[1]);
-
 	// insertions
 	printf("Insertion d'un élément (\"blablablablablabla\") dans une hashmap vide :\n");
 	char * wordCheck;
@@ -323,10 +321,6 @@ int hash_test(void) {
 	printf("Suppression d'un élément absent de la hashmap (\"coucoucoucou\") :\n");
 	hashmap_remove(secondMap, tabTest[2]);
 	hash_dump(secondMap);
-
-	// + de 26 espaces : segfault ?! (ici 27)
-	//hashmap_insert(secondMap, "                           ");
-	//hash_dump(secondMap);
 
 	// destruction de la hashmap
 	printf("Destruction de la hashmap.\n");
