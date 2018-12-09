@@ -237,19 +237,20 @@ int ** plsc(text * refText, text * newText) {
 	if ((lg = (int **) malloc((refText->nbWordTokens + 1) * sizeof(int *))) == NULL)
 		return NULL;
 
-	int k;
+	int k, l;
 	for (k = 0; k < (refText->nbWordTokens + 1); k++) {
-		if ((lg[k] = (int *) malloc((newText->nbWordTokens + 1) * sizeof(int *))) == NULL) {
+		if ((lg[k] = (int *) malloc((newText->nbWordTokens + 1) * sizeof(int))) == NULL) {
 			free(lg);
 			return NULL;
 		}
 	}
 
-	// initialisation de la matrice ligne et colonne en 0 à 0
-	// for ...
-	//lg[i][0] = 0;
-	//lg[0][j] = 0;
-	// ...
+	// initialisation des premières ligne et colonne de la matrice à 0
+	for (k = 0; k < (refText->nbWordTokens + 1); k++) {
+		for (l = 0; l < (refText->nbWordTokens + 1); l++) {
+			lg[k][l] = 0;
+		}
+	}
 
 	// pour chaque mot de l'ancien texte (on démarre l'algo en 1,1)
 	int i = 1, j = 1;
