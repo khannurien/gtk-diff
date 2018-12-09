@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <math.h>
 #include "follow.h"
 #include "strhash.h"
 
@@ -219,7 +220,7 @@ void text_tokenize(hashmap * map, text * textStruct) {
 		}
 
 		// on demande le token suivant
-		if ((aToken = get_next_token(textStruct->text, map, pOffset, pWords, pTokens)) != NULL)
+		if ((aToken = get_next_token(textStruct->text, map, pOffset, pTokens, pWords)) != NULL)
 			textStruct->tokenizedText[(* pTokens) - 1] = aToken;
 	}
 
@@ -245,7 +246,9 @@ int ** plsc(text * refText, text * newText) {
 	}
 
 	// initialisation de la matrice ligne et colonne en 0 à 0
-	lg[0][0] = 0;
+	// for ...
+	//lg[i][0] = 0;
+	//lg[0][j] = 0;
 	// ...
 
 	// pour chaque mot de l'ancien texte (on démarre l'algo en 1,1)
@@ -263,9 +266,9 @@ int ** plsc(text * refText, text * newText) {
 
 			// sinon, on remplit la matrice lg selon l'algorithme du cours
 			if (refText->tokenizedText[yToken]->data.word == newText->tokenizedText[xToken]->data.word) {
-				lg[i][j] = "..."; // TODO
+				lg[i][j] = lg[i - 1][j - 1] + 1;
 			} else {
-				lg[i][j] = "..."; // TODO
+				lg[i][j] = fmax(lg[i - 1][j], lg[i][j-1]);
 			}
 
 			j++;
@@ -281,22 +284,27 @@ int ** plsc(text * refText, text * newText) {
 // on se place en (n, n) correspondant aux dernières lettres de chaque chaîne
 text * diff_create(int ** lg, text * refText, text * newText) {
 	// indices dans les matrices, initialisés au max
-	int i = (sizeof(lg)) / (sizeof(lg[0]));
-	int j = (sizeof(lg[0])) / (sizeof(lg[0][0]));
+	int i = refText->nbWordTokens;
+	int j = newText->nbWordTokens;
 	// nombre de tokens lus dans chaque texte
-	int refTokenRd = 0;
-	int newTokenRd = 0;
+	int refTokenRd = refText->nbTokens - 1;
+	int newTokenRd = newText->nbTokens - 1;
 	// nombre de tokens écrits dans le tableau de résultat
-	int diffTokenWr = 0;
+	int diffTokenWr = refTokenRd + newTokenRd;
 	// tableau de résultat
-	token * tDiff[newText->nbTokens + refText->nbTokens];
+	token ** tDiff = (token **) malloc(diffTokenWr * sizeof(token *));
+	// texte résultant
+	text * diffText;
+	diffText = (text *) malloc(sizeof(text));
+	diffText->tokenizedText = tDiff;
 
-	// parcours de la matricemake
-
+	// parcours de la matrice
 	while ((i > 0) && (j > 0)) {
 		if ((newText->tokenizedText[newTokenRd]->type == SHORT_SPACE) || (newText->tokenizedText[newTokenRd]->type == SPACE)) {
 			// si le token courant dans le nouveau texte est un espace
-			// ...
+			tDiff[diffTokenWr] = newText->tokenizedText[newTokenRd];
+			diffTokenWr--;
+			newTokenRd--;
 		} else if ((refText->tokenizedText[newTokenRd]->type == SHORT_SPACE) || (refText->tokenizedText[newTokenRd]->type == SPACE)) {
 			// si le token courant dans l'ancien texte est un espace
 			refTokenRd--;
@@ -354,4 +362,12 @@ text * diff_create(int ** lg, text * refText, text * newText) {
 		// ...
 		i--;
 	}
+
+	while (diffTokenWr > 0) {
+		// malloc d'un jeton EMPTY
+		diffTokenWr--;
+	}
+
+	// on retourne le nouveau texte
+	return diffText;
 }

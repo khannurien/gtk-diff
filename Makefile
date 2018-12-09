@@ -2,7 +2,7 @@ progTest: follow.o strhash.o list.o main.o
 	gcc -o bin/progTest obj/follow.o obj/strhash.o obj/list.o obj/main.o
 
 follow.o: src/follow.c src/follow.h
-	gcc -c src/follow.c -o obj/follow.o
+	gcc -c src/follow.c -o obj/follow.o -lm
 
 strhash.o: src/strhash.c src/strhash.h
 	gcc -c src/strhash.c -o obj/strhash.o -lm
