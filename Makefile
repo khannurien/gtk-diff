@@ -1,5 +1,8 @@
-progTest: follow.o strhash.o list.o main.o
-	gcc -o bin/progTest obj/follow.o obj/strhash.o obj/list.o obj/main.o
+progTest: test.o follow.o strhash.o list.o main.o
+	gcc -o bin/progTest obj/test.o obj/follow.o obj/strhash.o obj/list.o obj/main.o
+
+test.o: src/test.c src/test.h
+	gcc -c src/test.c -o obj/test.o
 
 follow.o: src/follow.c src/follow.h
 	gcc -c src/follow.c -o obj/follow.o -lm
