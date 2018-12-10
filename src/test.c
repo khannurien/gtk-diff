@@ -341,10 +341,10 @@ int follow_test(void) {
 	// chemin des fichiers
 	//char * refFile = "data/short.txt";
 	//char * newFile = "data/short2.txt";
-	//char * refFile = "data/testRef.txt";
-	//char * newFile = "data/testNew.txt";
-	char * refFile = "data/segfault3.txt";
-	char * newFile = "data/segfault2.txt";
+	char * refFile = "data/testRef.txt";
+	char * newFile = "data/testNew.txt";
+	//char * refFile = "data/segfault3.txt";
+	//char * newFile = "data/segfault2.txt";
 	// chargement d'un premier texte
 	text * refText;
 	if ((refText = text_load(refFile)) == NULL)
@@ -377,16 +377,35 @@ int follow_test(void) {
 	printf("Tokenisation du texte modifié...\n");
 	text_tokenize(newFollow->map, newFollow->pNewText);
 
+	// affichage du contenu des tokens
+	printf("Affichage du contenu des tokens du texte d'origine :\n");
+	tokens_dump(newFollow->pRefText);
+	printf("Affichage du contenu des tokens du texte modifié :\n");
+	tokens_dump(newFollow->pRefText);
+
 	// affichage de la hashmap
 	printf("Affichage de la hashmap après tokenisation :\n");
 	hash_dump(newFollow->map);
 	hashmap_stats(newFollow->map);
 
+	// tests de plsc
+	int ** newPLSC;
+	newPLSC = plsc(newFollow->pRefText, newFollow->pNewText);
+	// affichage de la matrice
+	int x, y;
+	for (x = 0; x < newFollow->pRefText->nbWordTokens + 1; x++) {
+		for (y = 0; y < newFollow->pRefText->nbWordTokens + 1; y++) {
+			printf("%d\t", newPLSC[x][y]);
+		}
+		printf("\n");
+	}
+	printf("\n\n");
+
 	// tests unitaires OK :-)
 	return 0;
 }
 
-// ensemble des tests
+// fonction pour l'ensemble des tests
 int test_all(void) {
 	if ((list_test()) == 0)
 		printf("Tests unitaires sur les listes : OK.\n\n");

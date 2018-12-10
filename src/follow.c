@@ -4,6 +4,24 @@
 #include "follow.h"
 #include "strhash.h"
 
+// fonction d'affichage des tokens d'un text
+void tokens_dump(text * textStruct) {
+	int i;
+	for (i = 0; i < textStruct->nbTokens; i++) {
+		if ((textStruct->tokenizedText[i]->type == WORD) || (textStruct->tokenizedText[i]->type == SPACE)) {
+			printf("%s", textStruct->tokenizedText[i]->data.word);
+		} else if (textStruct->tokenizedText[i]->type == SHORT_SPACE) {
+			int j;
+			while (j < 4) {
+				printf("%c", textStruct->tokenizedText[i]->data.space[j]);
+				j++;
+			}
+		}
+	}
+	// flush du buffer
+	printf("\n\n");
+}
+
 // allocation et chargement du texte
 // retourne la structure text * pour un texte à partir de son chemin d'accès
 text * text_load(const char * filename) {
@@ -232,22 +250,25 @@ void text_tokenize(hashmap * map, text * textStruct) {
 // algo PLSC (Plus Longue Sous-Séquence Commune)
 // les éléments communs doivent être dans le même ordre, mais pas nécessairement consécutifs
 int ** plsc(text * refText, text * newText) {
-	// allocation de la matrice à deux dimensions en fonction du nombre de jetons de type WORD dans chaque structure
+	// allocation de la matrice à deux dimensions
 	int ** lg;
-	if ((lg = (int **) malloc((refText->nbWordTokens + 1) * sizeof(int *))) == NULL)
+	// en fonction du nombre de jetons de type WORD dans chaque structure
+	int maxTokens = fmax(refText->nbWordTokens, newText->nbWordTokens);
+
+	if ((lg = (int **) malloc((maxTokens + 1) * sizeof(int *))) == NULL)
 		return NULL;
 
 	int k, l;
-	for (k = 0; k < (refText->nbWordTokens + 1); k++) {
-		if ((lg[k] = (int *) malloc((newText->nbWordTokens + 1) * sizeof(int))) == NULL) {
+	for (k = 0; k < (maxTokens + 1); k++) {
+		if ((lg[k] = (int *) malloc((maxTokens + 1) * sizeof(int))) == NULL) {
 			free(lg);
 			return NULL;
 		}
 	}
 
 	// initialisation des premières ligne et colonne de la matrice à 0
-	for (k = 0; k < (refText->nbWordTokens + 1); k++) {
-		for (l = 0; l < (refText->nbWordTokens + 1); l++) {
+	for (k = 0; k < (maxTokens + 1); k++) {
+		for (l = 0; l < (maxTokens + 1); l++) {
 			lg[k][l] = 0;
 		}
 	}

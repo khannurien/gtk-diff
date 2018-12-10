@@ -28,6 +28,9 @@ typedef struct follow {
 	text * diffText; // doc représentant la différence entre les deux
 } follow;
 
+// fonction d'affichage des tokens d'un text
+void tokens_dump(text * textStruct);
+
 // création de la structure follow et sa hashmap
 // le reste des champs est à NULL
 follow * follow_init(void);
