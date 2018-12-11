@@ -282,14 +282,14 @@ int ** plsc(text * refText, text * newText) {
 		// si on dépasse les bornes de la matrice, on arrête
 		if (i > refText->nbWordTokens) break;
 		// si ce n'est pas un mot, on passe au token suivant
-		if (refText->tokenizedText[yToken] != WORD) continue;
+		if (refText->tokenizedText[yToken]->type != WORD) continue;
 
 		// sinon, pour chaque mot du nouveau texte
 		for (xToken = 0; xToken < newText->nbTokens; xToken++) {
 			// si on dépasse les bornes de la matrice, on arrête
 			if (j > newText->nbWordTokens) break;
 			// si ce n'est pas un mot, on passe au token suivant
-			if (newText->tokenizedText[xToken] != WORD) continue;
+			if (newText->tokenizedText[xToken]->type != WORD) continue;
 
 			// sinon, on remplit la matrice lg selon l'algorithme du cours
 			if (refText->tokenizedText[yToken]->data.word == newText->tokenizedText[xToken]->data.word) {

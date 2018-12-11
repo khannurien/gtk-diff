@@ -389,12 +389,13 @@ int follow_test(void) {
 	hashmap_stats(newFollow->map);
 
 	// tests de plsc
+	printf("\nAffichage de la matrice PLSC :\n\n");
 	int ** newPLSC;
 	newPLSC = plsc(newFollow->pRefText, newFollow->pNewText);
 	// affichage de la matrice
 	int x, y;
 	for (x = 0; x < newFollow->pRefText->nbWordTokens + 1; x++) {
-		for (y = 0; y < newFollow->pRefText->nbWordTokens + 1; y++) {
+		for (y = 0; y < newFollow->pNewText->nbWordTokens + 1; y++) {
 			printf("%d\t", newPLSC[x][y]);
 		}
 		printf("\n");
