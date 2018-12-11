@@ -339,10 +339,10 @@ int hash_test(void) {
 // fonction de tests sur follow
 int follow_test(void) {
 	// chemin des fichiers
-	//char * refFile = "data/short.txt";
-	//char * newFile = "data/short2.txt";
-	char * refFile = "data/testRef.txt";
-	char * newFile = "data/testNew.txt";
+	char * refFile = "data/short.txt";
+	char * newFile = "data/short2.txt";
+	//char * refFile = "data/testRef.txt";
+	//char * newFile = "data/testNew.txt";
 	//char * refFile = "data/segfault3.txt";
 	//char * newFile = "data/segfault2.txt";
 	// chargement d'un premier texte
@@ -378,10 +378,10 @@ int follow_test(void) {
 	text_tokenize(newFollow->map, newFollow->pNewText);
 
 	// affichage du contenu des tokens
-	printf("Affichage du contenu des tokens du texte d'origine :\n");
+	/* printf("Affichage du contenu des tokens du texte d'origine :\n");
 	tokens_dump(newFollow->pRefText);
 	printf("Affichage du contenu des tokens du texte modifié :\n");
-	tokens_dump(newFollow->pRefText);
+	tokens_dump(newFollow->pRefText); */
 
 	// affichage de la hashmap
 	printf("Affichage de la hashmap après tokenisation :\n");
