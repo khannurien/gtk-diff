@@ -408,6 +408,9 @@ int follow_test(void) {
 	diffText = diff_create(newPLSC, refText, newText);
 	newFollow->diffText = diffText;
 
+	// affichage diff
+	tokens_dump(newFollow->diffText);
+
 	// tests unitaires OK :-)
 	return 0;
 }

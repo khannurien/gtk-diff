@@ -27,6 +27,7 @@
     <property name="title" translatable="yes">GTK-Diff</property>
     <property name="default_width">800</property>
     <property name="default_height">600</property>
+    <property name="icon_name">document-revert</property>
     <property name="startup_id">mainWindow</property>
     <signal name="destroy" handler="on_mainWindow_destroy" swapped="no"/>
     <child>

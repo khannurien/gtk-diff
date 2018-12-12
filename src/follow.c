@@ -8,7 +8,7 @@
 void tokens_dump(text * textStruct) {
 	int i;
 	for (i = 0; i < textStruct->nbTokens; i++) {
-		if ((textStruct->tokenizedText[i]->type == WORD) || (textStruct->tokenizedText[i]->type == SPACE)) {
+		if ((textStruct->tokenizedText[i]->type == WORD) || (textStruct->tokenizedText[i]->type == SPACE) || (textStruct->tokenizedText[i]->type == REPLACE) || (textStruct->tokenizedText[i]->type == INSERT) || (textStruct->tokenizedText[i]->type == ERASE)) {
 			printf("%s", textStruct->tokenizedText[i]->data.word);
 		} else if (textStruct->tokenizedText[i]->type == SHORT_SPACE) {
 			int j = 0;
@@ -329,6 +329,7 @@ text * diff_create(int ** lg, text * refText, text * newText) {
 	text * diffText;
 	diffText = (text *) malloc(sizeof(text));
 	diffText->tokenizedText = tDiff;
+	diffText->nbTokens = diffTokenWr; 
 
 	// parcours de la matrice
 	while ((i > 0) && (j > 0)) {
@@ -433,10 +434,10 @@ text * diff_create(int ** lg, text * refText, text * newText) {
 		}
 	}
 
-	while (diffTokenWr > 0) {
+	while (diffTokenWr >= 0) {
 		// malloc d'un jeton EMPTY
 		if ((tDiff[diffTokenWr] = (token *) malloc(sizeof(token))) == NULL) {
-			// free ...
+			free(diffText);
 			return NULL;
 		}
 
