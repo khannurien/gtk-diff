@@ -173,7 +173,8 @@ int list_test(void) {
 	s_node * nodeTest;
 	printf("Test orderedList_insert sur liste ordonnée\n");
 	s_node * orderedList = list_create();
-	for (int i = 0; i < 10; i++) 
+	int i;
+	for (i = 0; i < 10; i++) 
 		orderedList = list_append(orderedList, &tabTestbis[i]);
 	// affichage
 	printf("Liste ordonnée croissante de 1 à 10 :\n");
@@ -378,10 +379,10 @@ int follow_test(void) {
 	text_tokenize(newFollow->map, newFollow->pNewText);
 
 	// affichage du contenu des tokens
-	/* printf("Affichage du contenu des tokens du texte d'origine :\n");
+	printf("Affichage du contenu des tokens du texte d'origine :\n");
 	tokens_dump(newFollow->pRefText);
 	printf("Affichage du contenu des tokens du texte modifié :\n");
-	tokens_dump(newFollow->pRefText); */
+	tokens_dump(newFollow->pNewText);
 
 	// affichage de la hashmap
 	printf("Affichage de la hashmap après tokenisation :\n");
@@ -401,6 +402,11 @@ int follow_test(void) {
 		printf("\n");
 	}
 	printf("\n\n");
+
+	// tests diff_create
+	text * diffText;
+	diffText = diff_create(newPLSC, refText, newText);
+	newFollow->diffText = diffText;
 
 	// tests unitaires OK :-)
 	return 0;

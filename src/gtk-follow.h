@@ -7,12 +7,18 @@
 // structure pour la vue
 typedef struct viewGTK {
 	GtkWindow * mainWindow;
-	GtkWindow * textLeft;
-	GtkWindow * textRight;
+	GtkTextView * textLeft;
+	GtkTextView * textRight;
+	GtkTextBuffer * refBuffer;
+	GtkTextBuffer * newBuffer;
+	GtkTextBuffer * diffBuffer;
 	follow * texts;
 } viewGTK;
 
-// fonction de gestion des événements
+// fonctions de gestion des événements
+// ouverture du texte de référence
 void open_ref_event(GtkMenuItem * menuItem, gpointer user_data);
+// ouverture du texte modifié
+void open_new_event(GtkMenuItem * menuItem, gpointer user_data);
 
 #endif

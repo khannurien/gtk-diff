@@ -11,8 +11,8 @@ void tokens_dump(text * textStruct) {
 		if ((textStruct->tokenizedText[i]->type == WORD) || (textStruct->tokenizedText[i]->type == SPACE)) {
 			printf("%s", textStruct->tokenizedText[i]->data.word);
 		} else if (textStruct->tokenizedText[i]->type == SHORT_SPACE) {
-			int j;
-			while (j < 1) { // TODO: il faudrait avoir le nombre de délimiteurs dans le token
+			int j = 0;
+			while ((j <= 3) && (textStruct->tokenizedText[i]->data.space[j] != '\0' )) {
 				printf("%c", textStruct->tokenizedText[i]->data.space[j]);
 				j++;
 			}
@@ -120,6 +120,9 @@ token * get_next_token(char * text, hashmap * map, int * offset, int * tokens, i
 			int j;
 			for (j = 0; j < i; j++)
 				newToken->data.space[j] = aChar[j];
+			// si le tableau n'est pas rempli, on ajoute le caractère sentinelle
+			if (j != 3)
+				newToken->data.space[j] = '\0';
 		} else if (i > 4) {
 			// espace long : on change le type du token
 			newToken->type = SPACE;
