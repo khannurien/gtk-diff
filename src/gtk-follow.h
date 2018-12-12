@@ -7,6 +7,8 @@
 // structure pour la vue
 typedef struct viewGTK {
 	GtkWindow * mainWindow;
+	GtkWindow * textLeft;
+	GtkWindow * textRight;
 	follow * texts;
 } viewGTK;
 
