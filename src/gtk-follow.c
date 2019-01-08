@@ -143,12 +143,13 @@ void open_ref_event(GtkMenuItem * menuItem, gpointer user_data) {
 		gtk_text_buffer_get_start_iter(buffer, &start);
 		gtk_text_buffer_get_end_iter(buffer, &iter);
 		gtk_text_buffer_delete(buffer, &start, &iter);
+		printf("5\n");
 
 		int i;
 		for (i = 0; i < view->texts->diffText->nbTokens; i++) {
 			gtk_text_buffer_get_end_iter(buffer, &iter);
 			if ((view->texts->diffText->tokenizedText[i]->type == WORD) || (view->texts->diffText->tokenizedText[i]->type == SPACE)) {
-				gtk_text_buffer_insert(view->refBuffer, &iter, view->texts->diffText->tokenizedText[i]->data.space, -1);
+				gtk_text_buffer_insert(view->refBuffer, &iter, view->texts->diffText->tokenizedText[i]->data.word, -1);
 			} else if ((view->texts->diffText->tokenizedText[i]->type == ERASE)) {
 				gtk_text_buffer_insert_with_tags_by_name(view->refBuffer, &iter, view->texts->diffText->tokenizedText[i]->data.word, -1, "red_foreground", NULL);
 			} else if ((view->texts->diffText->tokenizedText[i]->type == INSERT)) {
@@ -158,9 +159,9 @@ void open_ref_event(GtkMenuItem * menuItem, gpointer user_data) {
 			} else if (view->texts->diffText->tokenizedText[i]->type == SHORT_SPACE) {
 				int j = 0;
 				while ((j <= 3) && (view->texts->diffText->tokenizedText[i]->data.space[j] != '\0' )) {
+					gtk_text_buffer_insert(view->refBuffer, &iter, view->texts->diffText->tokenizedText[i]->data.space, -1);
 					j++;
 				}
-				gtk_text_buffer_insert(view->refBuffer, &iter, view->texts->diffText->tokenizedText[i]->data.space, j);
 			}
 		}
 	}

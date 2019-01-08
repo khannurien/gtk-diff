@@ -340,8 +340,10 @@ int hash_test(void) {
 // fonction de tests sur follow
 int follow_test(void) {
 	// chemin des fichiers
-	char * refFile = "data/short.txt";
-	char * newFile = "data/short2.txt";
+	//char * refFile = "data/short.txt";
+	//char * newFile = "data/short2.txt";
+	char * refFile = "data/cc.txt";
+	char * newFile = "data/dd.txt";
 	//char * refFile = "data/testRef.txt";
 	//char * newFile = "data/testNew.txt";
 	//char * refFile = "data/segfault3.txt";

@@ -322,12 +322,18 @@ text * diff_create(int ** lg, text * refText, text * newText) {
 	int refTokenRd = refText->nbTokens - 1;
 	int newTokenRd = newText->nbTokens - 1;
 	// nombre de tokens écrits dans le tableau de résultat
-	int diffTokenWr = refTokenRd + newTokenRd - 1;
+	int diffTokenWr = refTokenRd + newTokenRd;
 	// tableau de résultat
-	token ** tDiff = (token **) malloc(diffTokenWr * sizeof(token *));
+	token ** tDiff;
+	if ((tDiff = (token **) malloc((diffTokenWr + 1) * sizeof(token *))) == NULL)
+			return NULL;
 	// texte résultant
 	text * diffText;
-	diffText = (text *) malloc(sizeof(text));
+	if ((diffText = (text *) malloc(sizeof(text))) == NULL) {
+			free(tDiff);
+			return NULL;
+	}
+	// données de la structure
 	diffText->tokenizedText = tDiff;
 	diffText->nbTokens = diffTokenWr; 
 
@@ -375,26 +381,20 @@ text * diff_create(int ** lg, text * refText, text * newText) {
 			// insertion
 			// le jeton du nouveau texte passe en INSERT et est ajouté au résultat
 			newText->tokenizedText[newTokenRd]->type = INSERT;
-			tDiff[diffTokenWr] = newText->tokenizedText[newTokenRd];
-			diffTokenWr--;
 			// il reste des tokens à lire dans le nouveau texte
-			if(newTokenRd >= 0) {
-				tDiff[diffTokenWr--]=newText->tokenizedText[newTokenRd--];
+			if (newTokenRd >= 0) {
+				tDiff[diffTokenWr--] = newText->tokenizedText[newTokenRd--];
 			}
 
 			// on décrémente j
 			j--;
-
-			// ...
 		} else {
 			// suppression
 			// on modifie le type du jeton du texte de référence en ERASE et on l'ajoute au résultat
-			refText->tokenizedText[refTokenRd]->type = EMPTY;
-			tDiff[diffTokenWr] = refText->tokenizedText[refTokenRd];
-			diffTokenWr--;
+			refText->tokenizedText[refTokenRd]->type = ERASE;
 			// il reste des tokens à lire dans l'ancien texte
-			if(refTokenRd >= 0) {
-				tDiff[diffTokenWr--]=refText->tokenizedText[refTokenRd--];
+			if (refTokenRd >= 0) {
+				tDiff[diffTokenWr--] = refText->tokenizedText[refTokenRd--];
 			}
 
 			// on décrémente i
@@ -426,7 +426,7 @@ text * diff_create(int ** lg, text * refText, text * newText) {
 			refTokenRd--;
 			diffTokenWr--;
 		} else {
-			refText->tokenizedText[refTokenRd]->type = INSERT;
+			refText->tokenizedText[refTokenRd]->type = ERASE;
 			tDiff[diffTokenWr] = refText->tokenizedText[refTokenRd];
 			refTokenRd--;
 			diffTokenWr--;
@@ -437,6 +437,7 @@ text * diff_create(int ** lg, text * refText, text * newText) {
 	while (diffTokenWr >= 0) {
 		// malloc d'un jeton EMPTY
 		if ((tDiff[diffTokenWr] = (token *) malloc(sizeof(token))) == NULL) {
+			free(tDiff);
 			free(diffText);
 			return NULL;
 		}
