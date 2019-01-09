@@ -322,7 +322,7 @@ text * diff_create(int ** lg, text * refText, text * newText) {
 	int refTokenRd = refText->nbTokens - 1;
 	int newTokenRd = newText->nbTokens - 1;
 	// nombre de tokens écrits dans le tableau de résultat
-	int diffTokenWr = refTokenRd + newTokenRd;
+	int diffTokenWr = refTokenRd + newTokenRd - 1;
 	// tableau de résultat
 	token ** tDiff;
 	if ((tDiff = (token **) malloc((diffTokenWr + 1) * sizeof(token *))) == NULL)
