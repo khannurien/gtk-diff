@@ -39,9 +39,14 @@ int main(int argc, char * argv[]) {
 	view.refBuffer = gtk_text_view_get_buffer(view.textLeft);
 	view.newBuffer = gtk_text_view_get_buffer(view.textRight);
 
+	// tags GTK pour refBuffer
 	gtk_text_buffer_create_tag(view.refBuffer, "blue_foreground", "foreground", "blue", NULL);
 	gtk_text_buffer_create_tag(view.refBuffer, "red_foreground", "foreground", "red", NULL);
 	gtk_text_buffer_create_tag(view.refBuffer, "green_foreground", "foreground", "green", NULL);
+	// tags GTK pour newBuffer
+	gtk_text_buffer_create_tag(view.newBuffer, "blue_foreground", "foreground", "blue", NULL);
+	gtk_text_buffer_create_tag(view.newBuffer, "red_foreground", "foreground", "red", NULL);
+	gtk_text_buffer_create_tag(view.newBuffer, "green_foreground", "foreground", "green", NULL);
 
 	// connexion de l'IHM aux signaux de la vue
 	gtk_builder_connect_signals(ihm, &view);
@@ -62,8 +67,6 @@ void on_mainWindow_destroy() {
 
 // ouverture du texte de référence
 void open_ref_event(GtkMenuItem * menuItem, gpointer user_data) {
-	printf("-3\n");
-
 	// initialisation de la vue
 	viewGTK * view = (viewGTK *) user_data;
 	char * refFilename = NULL;
@@ -79,21 +82,14 @@ void open_ref_event(GtkMenuItem * menuItem, gpointer user_data) {
 		NULL);
 
 	if (gtk_dialog_run(GTK_DIALOG(dialog)) == GTK_RESPONSE_ACCEPT) {
-		// chargement du fichier
+		// chargement du fichier de référence
 		refFilename = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dialog));
 	}
 
 	gtk_widget_hide(GTK_WIDGET(dialog));
 
-	dialog = gtk_file_chooser_dialog_new("Choisir le document",
-		view->mainWindow,
-		GTK_FILE_CHOOSER_ACTION_OPEN,
-		"_Cancel", GTK_RESPONSE_CANCEL,
-		"_Open", GTK_RESPONSE_ACCEPT,
-		NULL);
-
 	if (gtk_dialog_run(GTK_DIALOG(dialog)) == GTK_RESPONSE_ACCEPT) {
-		// chargement du fichier
+		// chargement du fichier modifié
 		newFilename = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dialog));
 	}
 
@@ -101,67 +97,72 @@ void open_ref_event(GtkMenuItem * menuItem, gpointer user_data) {
 
 	if (refFilename != NULL && newFilename != NULL) {
 
-		// chargement du texte
+		// chargement du texte de référence
 		text * refText;
 		if ((refText = text_load(refFilename)) == NULL)
 			return;
-		// chargement du texte
+		// chargement du texte modifié
 		text * newText;
 		if ((newText = text_load(newFilename)) == NULL)
 			return;
-		printf("-2\n");
 
 		// libération du nom de fichier
-		//g_free(filename);
+		g_free(refFilename);
+		g_free(newFilename);
 		
 		// association du texte à notre instance de follow
 		view->texts->pRefText = refText;
 		view->texts->pNewText = newText;
 
 		// tokenisation du texte
-		printf("-1\n");
 		text_tokenize(view->texts->map, view->texts->pRefText);
-		printf("0\n");
 		text_tokenize(view->texts->map, view->texts->pNewText);
-		tokens_dump(view->texts->pRefText);
-		tokens_dump(view->texts->pNewText);
+//		tokens_dump(view->texts->pRefText);
+//		tokens_dump(view->texts->pNewText);
 
-		printf("1\n");
-
-		// diff
+		// création du diff
 		int ** lg = plsc(refText, newText);
-		printf("2\n");
 		view->texts->diffText = diff_create(lg, refText, newText);
-		printf("3\n");
-		tokens_dump(view->texts->diffText);
-		printf("4\n");
+//		tokens_dump(view->texts->diffText);
 
-		// buffer
-		GtkTextIter iter, start;
-		GtkTextBuffer * buffer = view->refBuffer;
+		// buffer du fichier de référence
+		GtkTextIter refIter, refStart;
+		GtkTextBuffer * refBuffer = view->refBuffer;
 		// RAZ
-		gtk_text_buffer_get_start_iter(buffer, &start);
-		gtk_text_buffer_get_end_iter(buffer, &iter);
-		gtk_text_buffer_delete(buffer, &start, &iter);
-		printf("5\n");
+		gtk_text_buffer_get_start_iter(refBuffer, &refStart);
+		gtk_text_buffer_get_end_iter(refBuffer, &refIter);
+		gtk_text_buffer_delete(refBuffer, &refStart, &refIter);
 
-		int i;
+		// buffer du fichier modifié
+		GtkTextIter newIter, newStart;
+		GtkTextBuffer * newBuffer = view->newBuffer;
+		// RAZ
+		gtk_text_buffer_get_start_iter(newBuffer, &newStart);
+		gtk_text_buffer_get_end_iter(newBuffer, &newIter);
+		gtk_text_buffer_delete(newBuffer, &newStart, &newIter);
+
+		int i, j;
+		for (i = 0; i < view->texts->pRefText->nbTokens; i++) {
+			gtk_text_buffer_get_end_iter(refBuffer, &refIter);
+			if (view->texts->pRefText->tokenizedText[i]->type == SHORT_SPACE) {
+				gtk_text_buffer_insert(view->refBuffer, &refIter, view->texts->pRefText->tokenizedText[i]->data.space, -1);
+			} else {
+				gtk_text_buffer_insert(view->refBuffer, &refIter, view->texts->pRefText->tokenizedText[i]->data.word, -1);
+			}
+		}
+
 		for (i = 0; i < view->texts->diffText->nbTokens; i++) {
-			gtk_text_buffer_get_end_iter(buffer, &iter);
+			gtk_text_buffer_get_end_iter(newBuffer, &newIter);
 			if ((view->texts->diffText->tokenizedText[i]->type == WORD) || (view->texts->diffText->tokenizedText[i]->type == SPACE)) {
-				gtk_text_buffer_insert(view->refBuffer, &iter, view->texts->diffText->tokenizedText[i]->data.word, -1);
-			} else if ((view->texts->diffText->tokenizedText[i]->type == ERASE)) {
-				gtk_text_buffer_insert_with_tags_by_name(view->refBuffer, &iter, view->texts->diffText->tokenizedText[i]->data.word, -1, "red_foreground", NULL);
-			} else if ((view->texts->diffText->tokenizedText[i]->type == INSERT)) {
-				gtk_text_buffer_insert_with_tags_by_name(view->refBuffer, &iter, view->texts->diffText->tokenizedText[i]->data.word, -1, "green_foreground", NULL);
-			} else if ((view->texts->diffText->tokenizedText[i]->type == REPLACE)) {
-				gtk_text_buffer_insert_with_tags_by_name(view->refBuffer, &iter, view->texts->diffText->tokenizedText[i]->data.word, -1, "blue_foreground", NULL);
+				gtk_text_buffer_insert(view->newBuffer, &newIter, view->texts->diffText->tokenizedText[i]->data.word, -1);
+			} else if (view->texts->diffText->tokenizedText[i]->type == ERASE) {
+				gtk_text_buffer_insert_with_tags_by_name(view->newBuffer, &newIter, view->texts->diffText->tokenizedText[i]->data.word, -1, "red_foreground", NULL);
+			} else if (view->texts->diffText->tokenizedText[i]->type == INSERT) {
+				gtk_text_buffer_insert_with_tags_by_name(view->newBuffer, &newIter, view->texts->diffText->tokenizedText[i]->data.word, -1, "green_foreground", NULL);
+			} else if (view->texts->diffText->tokenizedText[i]->type == REPLACE) {
+				gtk_text_buffer_insert_with_tags_by_name(view->newBuffer, &newIter, view->texts->diffText->tokenizedText[i]->data.word, -1, "blue_foreground", NULL);
 			} else if (view->texts->diffText->tokenizedText[i]->type == SHORT_SPACE) {
-				int j = 0;
-				while ((j <= 3) && (view->texts->diffText->tokenizedText[i]->data.space[j] != '\0' )) {
-					gtk_text_buffer_insert(view->refBuffer, &iter, view->texts->diffText->tokenizedText[i]->data.space, -1);
-					j++;
-				}
+				gtk_text_buffer_insert(view->newBuffer, &newIter, view->texts->diffText->tokenizedText[i]->data.space, -1);
 			}
 		}
 	}

@@ -11,7 +11,6 @@ typedef struct viewGTK {
 	GtkTextView * textRight;
 	GtkTextBuffer * refBuffer;
 	GtkTextBuffer * newBuffer;
-	GtkTextBuffer * diffBuffer;
 	follow * texts;
 } viewGTK;
 
