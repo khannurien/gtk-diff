@@ -1,5 +1,14 @@
-progTest: test.o follow.o strhash.o list.o main.o
-	gcc -o bin/progTest obj/test.o obj/follow.o obj/strhash.o obj/list.o obj/main.o
+CFLAGS=-g -lm -rdynamic `pkg-config --cflags gtk+-3.0`
+LDFLAGS=`pkg-config --libs gtk+-3.0`
+
+all: gtk-follow.o follow.o strhash.o list.o main.o
+	gcc -g -o bin/gtk-diff obj/gtk-follow.o obj/follow.o obj/strhash.o obj/list.o $(CFLAGS) $(LDFLAGS)
+
+gtk-follow.o: src/gtk-follow.c src/gtk-follow.h
+	gcc -c src/gtk-follow.c -o obj/gtk-follow.o $(CFLAGS) $(LDFLAGS)
+
+test: test.o follow.o strhash.o list.o main.o
+	gcc -g -o bin/progTest obj/test.o obj/follow.o obj/strhash.o obj/list.o obj/main.o -lm
 
 test.o: src/test.c src/test.h
 	gcc -c src/test.c -o obj/test.o
@@ -17,4 +26,4 @@ main.o: src/main.c src/follow.h src/strhash.h src/list.h
 	gcc -c src/main.c -o obj/main.o
 
 clean:
-	rm bin/progTest* obj/*.o
+	rm bin/progTest* bin/gtk-diff* obj/*.o
