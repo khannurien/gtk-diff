@@ -39,10 +39,6 @@ int main(int argc, char * argv[]) {
 	view.refBuffer = gtk_text_view_get_buffer(view.textLeft);
 	view.newBuffer = gtk_text_view_get_buffer(view.textRight);
 
-	// tags GTK pour refBuffer
-	gtk_text_buffer_create_tag(view.refBuffer, "blue_foreground", "foreground", "blue", NULL);
-	gtk_text_buffer_create_tag(view.refBuffer, "red_foreground", "foreground", "red", NULL);
-	gtk_text_buffer_create_tag(view.refBuffer, "green_foreground", "foreground", "green", NULL);
 	// tags GTK pour newBuffer
 	gtk_text_buffer_create_tag(view.newBuffer, "blue_foreground", "foreground", "blue", NULL);
 	gtk_text_buffer_create_tag(view.newBuffer, "red_foreground", "foreground", "red", NULL);
@@ -65,14 +61,14 @@ void on_mainWindow_destroy() {
 	gtk_main_quit();
 }
 
-// ouverture du texte de référence
+// chargement consécutif du texte de référence, puis du texte modifié
 void open_ref_event(GtkMenuItem * menuItem, gpointer user_data) {
 	// initialisation de la vue
 	viewGTK * view = (viewGTK *) user_data;
 	char * refFilename = NULL;
 	char * newFilename = NULL;
 
-	// menu
+	// ouverture des fichiers texte
 	GtkWidget * dialog;
 	dialog = gtk_file_chooser_dialog_new("Choisir le document",
 		view->mainWindow,
@@ -117,13 +113,10 @@ void open_ref_event(GtkMenuItem * menuItem, gpointer user_data) {
 		// tokenisation du texte
 		text_tokenize(view->texts->map, view->texts->pRefText);
 		text_tokenize(view->texts->map, view->texts->pNewText);
-//		tokens_dump(view->texts->pRefText);
-//		tokens_dump(view->texts->pNewText);
 
 		// création du diff
 		int ** lg = plsc(refText, newText);
 		view->texts->diffText = diff_create(lg, refText, newText);
-//		tokens_dump(view->texts->diffText);
 
 		// buffer du fichier de référence
 		GtkTextIter refIter, refStart;
@@ -141,6 +134,8 @@ void open_ref_event(GtkMenuItem * menuItem, gpointer user_data) {
 		gtk_text_buffer_get_end_iter(newBuffer, &newIter);
 		gtk_text_buffer_delete(newBuffer, &newStart, &newIter);
 
+		// boucles d'affichage
+		// le buffer de gauche (refBuffer) contient le texte de référence
 		int i, j;
 		for (i = 0; i < view->texts->pRefText->nbTokens; i++) {
 			gtk_text_buffer_get_end_iter(refBuffer, &refIter);
@@ -151,6 +146,7 @@ void open_ref_event(GtkMenuItem * menuItem, gpointer user_data) {
 			}
 		}
 
+		// le buffer de droite (newBuffer) contient le résultat mis en forme du diff avec le texte modifié
 		for (i = 0; i < view->texts->diffText->nbTokens; i++) {
 			gtk_text_buffer_get_end_iter(newBuffer, &newIter);
 			if ((view->texts->diffText->tokenizedText[i]->type == WORD) || (view->texts->diffText->tokenizedText[i]->type == SPACE)) {
