@@ -153,7 +153,8 @@ token * get_next_token(char * text, hashmap * map, int * offset, int * tokens, i
 		(* offset) += i;
 		// incrémentation du compteur de tokens
 		(* tokens)++;
-	} else if ((aChar[0] == ',') || (aChar[0] == ';') || (aChar[0] == ':') || (aChar[0] == '?') || (aChar[0] == '!') || (aChar[0] == '.') ||
+	}
+	/* else if ((aChar[0] == ',') || (aChar[0] == ';') || (aChar[0] == ':') || (aChar[0] == '?') || (aChar[0] == '!') || (aChar[0] == '.') ||
 				(aChar[0] == '(') || (aChar[0] == ')') || (aChar[0] == '[') || (aChar[0] == ']') || (aChar[0] == '{') || (aChar[0] == '}')) {
 		// le mot est un signe de ponctuation
 		// on met à jour le token
@@ -169,29 +170,31 @@ token * get_next_token(char * text, hashmap * map, int * offset, int * tokens, i
 		(* words)++;
 		// incrémentation du compteur de tokens
 		(* tokens)++;
-	} else {
+	} */ else {
 		// sinon, c'est un mot
 		newToken->type = WORD;
 
 		// on alloue l'espace nécessaire à un buffer pour vingt caractères
-		char * buffer;
+		char buffer[8192];
+		/*char * buffer;
 		int bSize = 20;
 		if ((buffer = (char *) malloc((bSize + 1) * sizeof(char))) == NULL) {
 			free(newToken);
 			return NULL;
-		}
+		}*/
 
 		// on lit le mot jusqu'à l'EOF (cas du texte à un seul mot), un délimiteur ou un signe de ponctuation
 		int i = 0;
-		while ((aChar[i] != '\0') && (aChar[i] != ' ') && (aChar[i] != '\t') && (aChar[i] != '\n') && (aChar[i] != '\r') &&
+		/* while ((aChar[i] != '\0') && (aChar[i] != ' ') && (aChar[i] != '\t') && (aChar[i] != '\n') && (aChar[i] != '\r') &&
 			(aChar[i] != ',') && (aChar[i] != ';') && (aChar[i] != ':') && (aChar[i] != '?') && (aChar[i] != '!') && (aChar[i] != '.') &&
-			(aChar[i] != '(') && (aChar[i] != ')') && (aChar[i] != '[') && (aChar[i] != ']') && (aChar[i] != '{') && (aChar[i] != '}')) {
+			(aChar[i] != '(') && (aChar[i] != ')') && (aChar[i] != '[') && (aChar[i] != ']') && (aChar[i] != '{') && (aChar[i] != '}')) { */
+		while ((aChar[i] != '\0') && (aChar[i] != ' ') && (aChar[i] != '\t') && (aChar[i] != '\n') && (aChar[i] != '\r')) {
 			// on augmente la taille du buffer si nécessaire
-			if (i > bSize) {
+			/*if (i > bSize) {
 				// le mot le plus long en français fait 26 lettres
 				bSize += 6;
 				buffer = realloc(buffer, (bSize + 1) * sizeof(char));
-			}
+			}*/
 			
 			// on stocke chaque caractère dans le buffer
 			buffer[i] = aChar[i];
@@ -206,7 +209,7 @@ token * get_next_token(char * text, hashmap * map, int * offset, int * tokens, i
 		// on enregistre le mot dans la hashmap et on met à jour le pointeur data.word du token
 		newToken->data.word = hashmap_insert(map, buffer);
 		// on libère le buffer
-		free(buffer);
+		/*free(buffer);*/
 
 		// décalage de l'offset
 		(* offset) += i;
