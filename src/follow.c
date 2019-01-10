@@ -342,7 +342,7 @@ text * diff_create(int ** lg, text * refText, text * newText) {
 	}
 	// données de la structure
 	diffText->tokenizedText = tDiff;
-	diffText->nbTokens = diffTokenWr; 
+	diffText->nbTokens = diffTokenWr + 1;
 
 	// parcours de la matrice
 	while ((i > 0) && (j > 0)) {
