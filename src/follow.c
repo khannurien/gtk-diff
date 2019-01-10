@@ -121,8 +121,12 @@ token * get_next_token(char * text, hashmap * map, int * offset, int * tokens, i
 			for (j = 0; j < i; j++)
 				newToken->data.space[j] = aChar[j];
 			// si le tableau n'est pas rempli, on ajoute le caractère sentinelle
-			if (j != 3)
+			if (j != 3) {
 				newToken->data.space[j] = '\0';
+			} else {
+				// s'il est rempli par 4 délimiteurs, on ajoute le caractère sentinelle en dernière position
+				newToken->data.space[4] = '\0';
+			}
 		} else if (i > 4) {
 			// espace long : on change le type du token
 			newToken->type = SPACE;
@@ -322,16 +326,16 @@ text * diff_create(int ** lg, text * refText, text * newText) {
 	int refTokenRd = refText->nbTokens - 1;
 	int newTokenRd = newText->nbTokens - 1;
 	// nombre de tokens écrits dans le tableau de résultat
-	int diffTokenWr = refTokenRd + newTokenRd - 1;
+	int diffTokenWr = refText->nbTokens + newText->nbTokens - 1;
 	// tableau de résultat
 	token ** tDiff;
 	if ((tDiff = (token **) malloc((diffTokenWr + 1) * sizeof(token *))) == NULL)
-			return NULL;
+		return NULL;
 	// texte résultant
 	text * diffText;
 	if ((diffText = (text *) malloc(sizeof(text))) == NULL) {
-			free(tDiff);
-			return NULL;
+		free(tDiff);
+		return NULL;
 	}
 	// données de la structure
 	diffText->tokenizedText = tDiff;
@@ -339,13 +343,22 @@ text * diff_create(int ** lg, text * refText, text * newText) {
 
 	// parcours de la matrice
 	while ((i > 0) && (j > 0)) {
-		if ((newText->tokenizedText[newTokenRd]->type == SHORT_SPACE) || (newText->tokenizedText[newTokenRd]->type == SPACE)) {
-			// si le token courant dans le nouveau texte est un espace
+		if (((newText->tokenizedText[newTokenRd]->type == SHORT_SPACE) || (newText->tokenizedText[newTokenRd]->type == SPACE))
+		&& ((refText->tokenizedText[refTokenRd]->type == SHORT_SPACE) || (refText->tokenizedText[refTokenRd]->type == SPACE))) {
+			// le token courant dans les deux textes est un espace
+			tDiff[diffTokenWr] = newText->tokenizedText[newTokenRd];
+			diffTokenWr--;
+			newTokenRd--;
+			refTokenRd--;
+		} else if ((newText->tokenizedText[newTokenRd]->type == SHORT_SPACE) || (newText->tokenizedText[newTokenRd]->type == SPACE)) {
+			// sinon, si le token courant dans le nouveau texte est un espace
 			tDiff[diffTokenWr] = newText->tokenizedText[newTokenRd];
 			diffTokenWr--;
 			newTokenRd--;
 		} else if ((refText->tokenizedText[refTokenRd]->type == SHORT_SPACE) || (refText->tokenizedText[refTokenRd]->type == SPACE)) {
-			// si le token courant dans l'ancien texte est un espace
+			// sinon, si le token courant dans l'ancien texte est un espace
+			tDiff[diffTokenWr] = refText->tokenizedText[refTokenRd];
+			diffTokenWr--;
 			refTokenRd--;
 		} else if ((lg[i][j] == lg[i - 1][j - 1] + 1) && (newText->tokenizedText[newTokenRd]->data.word == refText->tokenizedText[refTokenRd]->data.word)) {
 			// mots identiques (appartenant à la PLSC)

@@ -9,7 +9,7 @@ typedef struct token {
 	int textOffset; // position dans le texte (char *) d'origine
 	union {
 		char * word; // pointeur sur un mot de la table de hashage
-		char space[4]; // jusqu'à 4 délimiteurs, on ne stocke pas dans la table de hashage
+		char space[5]; // jusqu'à 4 délimiteurs, on ne stocke pas dans la table de hashage
 	} data; // accès via data.word OU data.space selon le type WORD ou SHORT_SPACE
 } token;
 
