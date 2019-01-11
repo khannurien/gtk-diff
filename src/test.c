@@ -345,7 +345,7 @@ int follow_test(void) {
 	//char * refFile = "data/lipsum.txt";
 	//char * newFile = "data/bipsom.txt";
 	char * refFile = "data/lipsum.txt";
-	char * newFile = "data/lipsum.txt";
+	char * newFile = "data/bipsom.txt";
 	//char * refFile = "data/cc.txt";
 	//char * newFile = "data/dd.txt";
 	//char * refFile = "data/testRef.txt";
