@@ -1,5 +1,5 @@
 DIRS=bin obj
-CFLAGS=-g -lm -rdynamic `pkg-config --cflags gtk+-3.0`
+CFLAGS=-lm -rdynamic `pkg-config --cflags gtk+-3.0`
 LDFLAGS=`pkg-config --libs gtk+-3.0`
 
 all: gtk-follow.o follow.o strhash.o list.o main.o
@@ -28,6 +28,6 @@ main.o: src/main.c src/follow.h src/strhash.h src/list.h
 
 clean:
 	rm bin/progTest* bin/gtk-diff* obj/*.o; \
-	rmdir bin obj
+	rmdir $(DIRS)
 
 $(info $(shell mkdir -p $(DIRS)))

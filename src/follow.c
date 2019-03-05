@@ -345,7 +345,7 @@ text * diff_create(int ** lg, text * refText, text * newText) {
 	diffText->nbTokens = diffTokenWr + 1;
 
 	// parcours de la matrice
-	while ((i > 0) && (j > 0)) {
+	while ((i > 0) && (j > 0) && (refTokenRd >= 0) && (newTokenRd >= 0)) {
 		if (((newText->tokenizedText[newTokenRd]->type == SHORT_SPACE) || (newText->tokenizedText[newTokenRd]->type == SPACE))
 		&& ((refText->tokenizedText[refTokenRd]->type == SHORT_SPACE) || (refText->tokenizedText[refTokenRd]->type == SPACE))) {
 			// le token courant dans les deux textes est un espace
